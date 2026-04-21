@@ -35,7 +35,7 @@ body {
    NAVBAR
    ============================================================ */
 .navbar {
-  position: fixed;
+  position: absolute;
   top: 0; left: 0; right: 0;
   z-index: 100;
   padding: 0 var(--pad-x);
@@ -410,9 +410,10 @@ body {
 }
 [data-animate="fade-left"]  { transform: translateX(-40px); }
 [data-animate="fade-right"] { transform: translateX(40px);  }
+[data-animate="fade-up"]    { transform: translateY(30px);  }
 [data-animate].visible {
   opacity: 1;
-  transform: translateX(0);
+  transform: translate(0, 0);
 }
 
 /* ============================================================
@@ -599,4 +600,367 @@ body {
   .hero-title { font-size: clamp(2rem, 13vw, 3rem); }
   .input-wrap input { height: 46px; }
   .btn-subscribe { height: 46px; }
+}
+
+/* ============================================================
+   MENTORSHIP SECTION
+   ============================================================ */
+.mentorship {
+  background: #f0f0f0;
+  padding: clamp(4rem, 10vh, 7rem) var(--pad-x);
+}
+
+.mentorship-inner {
+  max-width: 1300px;
+  margin: 0 auto;
+}
+
+.mentorship-title {
+  font-family: var(--font-heading);
+  font-size: clamp(1.8rem, 4.5vw, 3.2rem);
+  text-align: center;
+  color: var(--black);
+  letter-spacing: 3px;
+  margin-bottom: clamp(2.5rem, 6vh, 4.5rem);
+}
+
+/* ---- Carousel wrapper ---- */
+.mentorship-carousel-wrap {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.mentorship-viewport {
+  flex: 1;
+  overflow: visible;
+  /* padding gives shadows room to render without clipping */
+  padding: 12px 8px;
+  margin: -12px -8px;
+}
+
+.mentorship-track {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(1rem, 2.5vw, 1.75rem);
+  transition: transform 0.55s cubic-bezier(0.65, 0, 0.35, 1);
+  will-change: transform;
+}
+
+/* ---- Card ---- */
+.ms-card {
+  background: #ffffff;
+  border-radius: 22px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: transform 0.35s ease, box-shadow 0.35s ease,
+              opacity 0.6s ease; /* opacity for scroll-in */
+}
+
+.ms-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 18px 52px rgba(0, 0, 0, 0.16);
+}
+
+/* Scroll-in state for ms-cards via data-animate="fade-up" */
+.ms-card[data-animate] {
+  /* inherits opacity:0 and transition from the global [data-animate] rule */
+}
+
+/* Icon area */
+.ms-card-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: clamp(1.5rem, 3vh, 2.2rem) 1rem clamp(0.6rem, 1.5vh, 1rem);
+}
+
+.ms-card-icon img {
+  display: block;
+  /* width/height set via HTML attribute */
+}
+
+/* Card title */
+.ms-card-title {
+  font-family: var(--font-heading);
+  font-size: clamp(0.78rem, 1.15vw, 1rem);
+  text-align: center;
+  color: var(--black);
+  letter-spacing: 1.5px;
+  padding: 0 1.25rem clamp(0.8rem, 1.8vh, 1.2rem);
+  line-height: 1.3;
+}
+
+/* Card image */
+.ms-card-img-wrap {
+  width: 100%;
+  aspect-ratio: 5 / 3;
+  overflow: hidden;
+}
+
+.ms-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+  transition: transform 0.45s ease;
+}
+
+.ms-card:hover .ms-card-img {
+  transform: scale(1.05);
+}
+
+/* Card body */
+.ms-card-body {
+  padding: clamp(1.2rem, 2.5vh, 1.75rem) clamp(1.2rem, 2.5vw, 1.75rem);
+  flex: 1;
+}
+
+.ms-included-label {
+  font-size: clamp(0.85rem, 1.2vw, 0.95rem);
+  font-weight: 700;
+  color: var(--black);
+  margin-bottom: 0.75rem;
+  text-align: center;
+}
+
+/* Bullet list */
+.ms-included-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.ms-included-list li {
+  font-size: clamp(0.78rem, 1vw, 0.88rem);
+  color: #444;
+  line-height: 1.55;
+  padding-left: 1.1rem;
+  position: relative;
+}
+
+.ms-included-list li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: #222;
+  font-size: 0.75rem;
+  top: 0.15em;
+}
+
+/* Plain paragraph inside .ms-card-body also gets consistent styling */
+.ms-card-body p:not(.ms-included-label) {
+  font-size: clamp(0.78rem, 1vw, 0.88rem);
+  color: #444;
+  line-height: 1.6;
+  margin-top: 0.45rem;
+}
+
+/* Card footer */
+.ms-card-footer {
+  padding: clamp(1rem, 2vh, 1.4rem) clamp(1.2rem, 2.5vw, 1.75rem) clamp(1.4rem, 3vh, 2rem);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.55rem;
+  border-top: 1px solid #ebebeb;
+}
+
+/* Price badge – NOT a button, just a label */
+.ms-price-badge {
+  display: inline-block;
+  background: var(--black);
+  color: var(--white);
+  border-radius: 50px;
+  padding: 0.55rem 2.2rem;
+  font-family: var(--font-heading);
+  font-size: clamp(1.15rem, 1.8vw, 1.45rem);
+  letter-spacing: 1px;
+  line-height: 1;
+}
+
+/* Price type label */
+.ms-price-label {
+  font-size: clamp(0.78rem, 1vw, 0.88rem);
+  color: #555;
+  font-weight: 400;
+}
+
+/* Learn More – styled as a link/button */
+.ms-learn-btn {
+  display: inline-block;
+  font-family: var(--font-body);
+  font-size: clamp(0.82rem, 1.1vw, 0.9rem);
+  font-weight: 800;
+  color: var(--black);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1.5px;
+  letter-spacing: 1.5px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 4px 0;
+  margin-top: 0.35rem;
+  transition: color 0.2s ease, letter-spacing 0.25s ease;
+}
+
+.ms-learn-btn:hover {
+  color: #555;
+  letter-spacing: 2.5px;
+}
+
+/* ---- Mobile arrow buttons (hidden on desktop) ---- */
+.ms-arrow {
+  display: none;
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--black);
+  color: var(--white);
+  border: none;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+  transition: background 0.2s, transform 0.2s, opacity 0.2s;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+}
+
+.ms-arrow:hover {
+  background: #333;
+}
+
+.ms-arrow:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ---- Dots indicator (hidden on desktop) ---- */
+.ms-dots {
+  display: none;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 1.6rem;
+}
+
+.ms-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #bbb;
+  transition: background 0.3s ease, transform 0.3s ease;
+  cursor: pointer;
+}
+
+.ms-dot.active {
+  background: var(--black);
+  transform: scale(1.4);
+}
+
+/* ============================================================
+   MENTORSHIP – RESPONSIVE
+   ============================================================ */
+
+/* Tablet (768 – 1023px): keep 3 cols but tighten */
+@media (max-width: 1023px) {
+  .mentorship-track {
+    gap: clamp(0.8rem, 2vw, 1.2rem);
+  }
+  .ms-card-title {
+    font-size: clamp(0.72rem, 1.4vw, 0.9rem);
+  }
+}
+
+/* Mobile (≤ 767px): single-card swipeable carousel */
+@media (max-width: 767px) {
+  .mentorship {
+    padding-left: 3.5rem;
+    padding-right: 3.5rem;
+  }
+
+  /* Positioning context so arrows can sit outside the track */
+  .mentorship-carousel-wrap {
+    position: relative;
+    display: block;
+  }
+
+  /* Clean clip — no padding/margin so card widths stay exact */
+  .mentorship-viewport {
+    overflow: hidden;
+    width: 100%;
+    /* Small vertical padding lets top/bottom shadow show */
+    padding: 14px 0;
+    margin: -14px 0;
+  }
+
+  /* Switch track from grid to flex */
+  .mentorship-track {
+    display: flex;
+    gap: 0;
+  }
+
+  /* Each card exactly fills the viewport width */
+  .ms-card {
+    flex: 0 0 100%;
+    width: 100%;
+    border-radius: 18px;
+    box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
+  }
+
+  .ms-card:hover {
+    transform: none;
+    box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
+  }
+
+  /* Arrows: absolutely placed, vertically centred, outside the card edges */
+  .ms-arrow {
+    display: flex;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    /* shift outward so they sit in the section padding, not on the card */
+    width: 40px;
+    height: 40px;
+  }
+
+  .ms-arrow--prev { left: -3rem; }
+  .ms-arrow--next { right: -3rem; }
+
+  /* Show dots */
+  .ms-dots {
+    display: flex;
+    margin-top: 1.4rem;
+  }
+
+  .ms-card-title {
+    font-size: 0.88rem;
+  }
+
+  .ms-included-list li {
+    font-size: 0.82rem;
+  }
+}
+
+/* Small mobile (≤ 480px) */
+@media (max-width: 480px) {
+  .ms-arrow {
+    width: 36px;
+    height: 36px;
+  }
+
+  .ms-price-badge {
+    font-size: 1.15rem;
+    padding: 0.5rem 1.8rem;
+  }
 }
