@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>John Doe – Become Aesthetic</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Allerta+Stencil&family=Almarai:wght@300;400;700;800&family=Keania+One&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+
+  <body>
+    <!-- ===== NAVBAR ===== -->
+    <nav class="navbar">
+      <div class="nav-inner">
+        <a href="#" class="nav-logo">John Doe</a>
+        <ul class="nav-links">
+          <li><a href="#">Mentorship</a></li>
+          <li><a href="#">About Me</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+        <!-- Hamburger (mobile) -->
+        <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- ===== HERO SECTION ===== -->
+    <section class="hero">
+      <!-- background overlay -->
+      <div class="hero-bg"></div>
+
+      <div class="hero-inner">
+        <!-- LEFT CONTENT -->
+        <div class="hero-left" data-animate="fade-left">
+          <h1 class="hero-title">BECOME AESTHETIC</h1>
+          <p class="hero-subtitle">
+            Get in Shape, working out 3 days<br />a week with a structured plan
+          </p>
+
+          <!-- FORM -->
+          <form class="subscribe-form" id="subscribeForm" novalidate>
+            <div class="form-row">
+              <div class="input-wrap">
+                <input
+                  type="text"
+                  id="firstName"
+                  name="firstName"
+                  placeholder="First Name"
+                  autocomplete="given-name"
+                />
+                <span class="field-error" id="firstNameError"></span>
+              </div>
+              <div class="input-wrap">
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  placeholder="Email"
+                  autocomplete="email"
+                />
+                <span class="field-error" id="emailError"></span>
+              </div>
+            </div>
+            <button type="submit" class="btn-subscribe"><span>SUBSCRIBE</span></button>
+          </form>
+
+          <p class="hero-quote">"Join the tribe, learning new stuff"</p>
+        </div>
+
+        <!-- RIGHT SLIDER -->
+        <div class="hero-right" data-animate="fade-right">
+          <div class="slider-viewport">
+            <div class="slider-track" id="sliderTrack">
+              <div class="slide active">
+                <img src="assets/slider-1.png" alt="Athlete 1" />
+              </div>
+              <div class="slide">
+                <img src="assets/slider-2.png" alt="Athlete 2" />
+              </div>
+              <div class="slide">
+                <img src="assets/slider-3.png" alt="Athlete 3" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Arrow Controls -->
+          <div class="slider-controls">
+            <button class="arrow-btn" id="prevBtn" aria-label="Previous slide">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6"></polyline>
+              </svg>
+            </button>
+            <button class="arrow-btn" id="nextBtn" aria-label="Next slide">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== POPUP OVERLAY ===== -->
+    <div class="popup-overlay" id="popupOverlay">
+      <div class="popup" id="popup">
+        <button class="popup-close" id="popupClose" aria-label="Close popup">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+        <div class="popup-icon" id="popupIcon"></div>
+        <h3 class="popup-title" id="popupTitle"></h3>
+        <p class="popup-msg" id="popupMsg"></p>
+      </div>
+    </div>
+
+    <script src="js/main.js"></script>
+  </body>
+</html>
