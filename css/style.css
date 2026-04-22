@@ -48,7 +48,7 @@ body {
 }
 
 .nav-inner {
-  background: var(--black);
+  background: var(--accent);
   border-radius: 16px;
   width: 100%;
   height: 60px;
@@ -500,6 +500,323 @@ body {
 .popup.error   .popup-title { color: var(--error);   }
 
 /* ============================================================
+   MENTORSHIP CHECKOUT MODAL
+   ============================================================ */
+.checkout-overlay,
+.payment-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(7, 7, 7, 0.7);
+  backdrop-filter: blur(3px);
+  z-index: 250;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+  padding: 1.25rem;
+}
+
+.checkout-overlay.active,
+.payment-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.checkout-modal,
+.payment-modal {
+  width: min(620px, 100%);
+  background: #ffffff;
+  border-radius: 20px;
+  border: 1px solid #e4e4e4;
+  box-shadow: 0 28px 56px rgba(0, 0, 0, 0.3);
+  color: #111;
+  position: relative;
+  transform: translateY(14px) scale(0.98);
+  transition: transform 0.25s ease;
+}
+
+.checkout-overlay.active .checkout-modal,
+.payment-overlay.active .payment-modal {
+  transform: translateY(0) scale(1);
+}
+
+.checkout-modal {
+  padding: clamp(1.2rem, 3.2vw, 2rem);
+}
+
+.checkout-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 50%;
+  background: #f4f4f4;
+  color: #181818;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.checkout-close svg {
+  width: 16px;
+  height: 16px;
+}
+
+.checkout-close:hover {
+  background: #e8e8e8;
+  transform: rotate(90deg);
+}
+
+.checkout-title,
+.payment-title {
+  font-family: var(--font-heading);
+  font-size: clamp(1.25rem, 3vw, 1.8rem);
+  letter-spacing: 1px;
+  color: #121212;
+}
+
+.checkout-selected {
+  margin-top: 0.45rem;
+  font-size: 0.95rem;
+  color: #5a5a5a;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.checkout-selected-label {
+  color: #666;
+  font-weight: 600;
+}
+
+.checkout-selected-plan {
+  color: #111;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+}
+
+.checkout-selected-amount {
+  background: #111;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.83rem;
+  padding: 0.18rem 0.5rem;
+  border-radius: 999px;
+}
+
+.checkout-form {
+  margin-top: 1rem;
+  display: grid;
+  gap: 0.7rem;
+}
+
+.checkout-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.checkout-field label {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.checkout-field input,
+.checkout-field textarea {
+  width: 100%;
+  border: 1px solid #d4d4d4;
+  border-radius: 10px;
+  background: #fff;
+  padding: 0.78rem 0.9rem;
+  font: inherit;
+  color: #111;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.checkout-field input {
+  min-height: 46px;
+}
+
+.checkout-field textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.checkout-field input:focus,
+.checkout-field textarea:focus {
+  border-color: #222;
+  box-shadow: 0 0 0 3px rgba(10, 10, 10, 0.12);
+}
+
+.checkout-field .error-field {
+  border-color: var(--error);
+  box-shadow: 0 0 0 3px rgba(255, 77, 77, 0.16);
+}
+
+.checkout-error {
+  min-height: 16px;
+  font-size: 0.78rem;
+  color: var(--error);
+  font-weight: 700;
+}
+
+.checkout-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.1rem;
+}
+
+.checkout-submit-btn {
+  min-width: 150px;
+  min-height: 46px;
+  border: 1px solid #0f0f0f;
+  background: #0f0f0f;
+  color: #fff;
+  border-radius: 10px;
+  font-family: var(--font-heading);
+  letter-spacing: 1px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.checkout-submit-btn:hover {
+  background: #2b2b2b;
+  transform: translateY(-1px);
+}
+
+.payment-modal {
+  background: #1a1a1a;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 24px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  max-width: 420px;
+  width: 90%;
+  padding: clamp(2rem, 5vw, 3rem) clamp(1.5rem, 5vw, 3rem);
+  text-align: center;
+  transform: scale(0.85) translateY(30px);
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.payment-overlay.active .payment-modal {
+  transform: scale(1) translateY(0);
+}
+
+.payment-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.payment-close svg {
+  width: 16px;
+  height: 16px;
+}
+
+.payment-close:hover {
+  background: rgba(255, 255, 255, 0.18);
+  transform: rotate(90deg);
+}
+
+.payment-icon {
+  font-size: clamp(2.5rem, 8vw, 3.5rem);
+  margin-bottom: 1rem;
+  animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.payment-title {
+  color: var(--white);
+  margin-bottom: 0.65rem;
+}
+
+.payment-message {
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.6;
+}
+
+.payment-external-message {
+  margin-top: 0.55rem;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.payment-modal.success .payment-title {
+  color: #15803d;
+}
+
+.payment-modal.failed .payment-title {
+  color: #b91c1c;
+}
+
+.iti {
+  width: 100%;
+}
+
+.iti input#checkoutPhone {
+  height: 46px;
+  border-radius: 10px;
+  padding-right: 0.9rem;
+}
+
+.iti__selected-country {
+  border-radius: 8px;
+  margin-left: 4px;
+  padding-right: 6px;
+}
+
+.iti__country-container {
+  padding: 0;
+}
+
+.iti__country-list {
+  width: 100%;
+  max-width: 100%;
+  border-radius: 12px;
+  border: 1px solid #d7d7d7;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.16);
+  margin-top: 6px;
+  max-height: 228px;
+}
+
+.iti__search-input {
+  border-radius: 10px;
+  border: 1px solid #d4d4d4;
+  min-height: 42px;
+  padding: 0 0.75rem;
+}
+
+.iti__search-input:focus {
+  border-color: #222;
+  box-shadow: 0 0 0 3px rgba(10, 10, 10, 0.1);
+}
+
+.iti__country {
+  padding-top: 9px;
+  padding-bottom: 9px;
+}
+
+/* ============================================================
    RESPONSIVE
    ============================================================ */
 
@@ -540,6 +857,24 @@ body {
   :root { --nav-h: 72px; }
   .nav-links { display: none; }
   .hamburger { display: flex; }
+
+  .checkout-modal {
+    padding: 1.05rem;
+    border-radius: 14px;
+  }
+
+  .payment-modal {
+    border-radius: 14px;
+    padding: 1.2rem;
+  }
+
+  .checkout-actions {
+    justify-content: stretch;
+  }
+
+  .checkout-submit-btn {
+    width: 100%;
+  }
 
   /* Restore symmetric padding; slider will negate it */
   .hero-inner {
@@ -603,6 +938,11 @@ body {
   .hero-title { font-size: clamp(2rem, 13vw, 3rem); }
   .input-wrap input { height: 46px; }
   .btn-subscribe { height: 46px; }
+
+  .checkout-overlay,
+  .payment-overlay {
+    padding: 0.8rem;
+  }
 }
 
 /* ============================================================
@@ -665,11 +1005,6 @@ body {
 .ms-card:hover {
   transform: translateY(-8px);
   box-shadow: 0 18px 52px rgba(0, 0, 0, 0.16);
-}
-
-/* Scroll-in state for ms-cards via data-animate="fade-up" */
-.ms-card[data-animate] {
-  /* inherits opacity:0 and transition from the global [data-animate] rule */
 }
 
 /* Icon area */

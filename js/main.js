@@ -346,3 +346,279 @@ window.addEventListener("resize", () => {
 
 // Init
 msGoTo(0);
+
+/* ============================================================
+   7. MENTORSHIP CHECKOUT MODAL + PAYMENT STATUS
+   ============================================================ */
+const checkoutOverlay = $("#checkoutOverlay");
+const checkoutModal = $(".checkout-modal");
+const checkoutClose = $("#checkoutClose");
+const checkoutForm = $("#checkoutForm");
+const checkoutSelectedCard = $("#checkoutSelectedCard");
+
+const checkoutName = $("#checkoutName");
+const checkoutPhone = $("#checkoutPhone");
+const checkoutEmail = $("#checkoutEmail");
+const checkoutNote = $("#checkoutNote");
+
+const checkoutNameError = $("#checkoutNameError");
+const checkoutPhoneError = $("#checkoutPhoneError");
+const checkoutEmailError = $("#checkoutEmailError");
+const checkoutNoteError = $("#checkoutNoteError");
+
+const paymentOverlay = $("#paymentOverlay");
+const paymentModal = $(".payment-modal");
+const paymentClose = $("#paymentClose");
+const paymentStatusIcon = $("#paymentStatusIcon");
+const paymentStatusTitle = $("#paymentStatusTitle");
+const paymentStatusMessage = $("#paymentStatusMessage");
+const paymentExternalMessage = $("#paymentExternalMessage");
+
+let selectedMentorshipCard = null;
+let itiInstance = null;
+
+if (window.intlTelInput && checkoutPhone) {
+  itiInstance = window.intlTelInput(checkoutPhone, {
+    initialCountry: "ca",
+    nationalMode: true,
+    autoPlaceholder: "aggressive",
+    strictMode: false,
+    separateDialCode: true,
+    utilsScript:
+      "https://cdn.jsdelivr.net/npm/intl-tel-input@25.3.1/build/js/utils.js",
+  });
+}
+
+function clearCheckoutFieldError(input, errorEl) {
+  input?.classList.remove("error-field");
+  if (errorEl) {
+    errorEl.textContent = "";
+  }
+}
+
+function setCheckoutFieldError(input, errorEl, message) {
+  input?.classList.add("error-field");
+  if (errorEl) {
+    errorEl.textContent = message;
+  }
+}
+
+function resetCheckoutValidation() {
+  clearCheckoutFieldError(checkoutName, checkoutNameError);
+  clearCheckoutFieldError(checkoutPhone, checkoutPhoneError);
+  clearCheckoutFieldError(checkoutEmail, checkoutEmailError);
+  clearCheckoutFieldError(checkoutNote, checkoutNoteError);
+}
+
+function getSelectedCardData(cardEl) {
+  return {
+    title: $(".ms-card-title", cardEl)?.textContent?.trim() ?? "Unknown Plan",
+    price: $(".ms-price-badge", cardEl)?.textContent?.trim() ?? "",
+    priceType: $(".ms-price-label", cardEl)?.textContent?.trim() ?? "",
+  };
+}
+
+function openCheckoutModal(cardEl) {
+  selectedMentorshipCard = cardEl;
+  const cardData = getSelectedCardData(cardEl);
+  checkoutSelectedCard.innerHTML = `
+    <span class="checkout-selected-label">Selected Plan:</span>
+    <span class="checkout-selected-plan">${cardData.title}</span>
+    <span class="checkout-selected-amount">${cardData.price}</span>
+  `;
+  checkoutOverlay.classList.add("active");
+  checkoutOverlay.setAttribute("aria-hidden", "false");
+}
+
+function closeCheckoutModal() {
+  checkoutOverlay.classList.remove("active");
+  checkoutOverlay.setAttribute("aria-hidden", "true");
+}
+
+function showPaymentStatus(isSuccess) {
+  paymentModal.className = `payment-modal ${isSuccess ? "success" : "failed"}`;
+
+  if (isSuccess) {
+    paymentStatusIcon.textContent = "🎉";
+    paymentStatusTitle.textContent = "Payment Successful";
+    paymentStatusMessage.textContent = "Payment successful. We will contact you soon.";
+  } else {
+    paymentStatusIcon.textContent = "⚠️";
+    paymentStatusTitle.textContent = "Payment Failed";
+    paymentStatusMessage.textContent =
+      "Payment failed. Please try again after some time. If amount is debited, our team will verify and contact you.";
+  }
+
+  if (paymentExternalMessage) {
+    paymentExternalMessage.textContent = "";
+    paymentExternalMessage.hidden = true;
+  }
+
+  paymentOverlay.classList.add("active");
+  paymentOverlay.setAttribute("aria-hidden", "false");
+}
+
+function showPaymentSuccessModal(externalMessage = "") {
+  showPaymentStatus(true);
+  if (paymentExternalMessage && externalMessage.trim()) {
+    paymentExternalMessage.textContent = externalMessage.trim();
+    paymentExternalMessage.hidden = false;
+  }
+}
+
+function showPaymentFailedModal(externalMessage = "") {
+  paymentModal.className = "payment-modal failed";
+  paymentStatusIcon.textContent = "⚠️";
+  paymentStatusTitle.textContent = "Payment Failed";
+  paymentStatusMessage.textContent = "Payment failed. Please try again later.";
+
+  if (paymentExternalMessage && externalMessage.trim()) {
+    paymentExternalMessage.textContent = externalMessage.trim();
+    paymentExternalMessage.hidden = false;
+  } else if (paymentExternalMessage) {
+    paymentExternalMessage.textContent = "";
+    paymentExternalMessage.hidden = true;
+  }
+
+  paymentOverlay.classList.add("active");
+  paymentOverlay.setAttribute("aria-hidden", "false");
+}
+
+function closePaymentStatus() {
+  paymentOverlay.classList.remove("active");
+  paymentOverlay.setAttribute("aria-hidden", "true");
+}
+
+function isValidCheckoutEmail(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
+}
+
+function sanitizePhoneInput(value) {
+  return value.replace(/[^0-9\s-]/g, "");
+}
+
+function validateCheckoutForm() {
+  const nameVal = checkoutName.value.trim();
+  const phoneVal = checkoutPhone.value.trim();
+  const emailVal = checkoutEmail.value.trim();
+  const noteVal = checkoutNote.value.trim();
+  let isValid = true;
+
+  resetCheckoutValidation();
+
+  if (!nameVal) {
+    setCheckoutFieldError(checkoutName, checkoutNameError, "Name is required.");
+    isValid = false;
+  }
+
+  if (!phoneVal) {
+    setCheckoutFieldError(checkoutPhone, checkoutPhoneError, "Mobile number is required.");
+    isValid = false;
+  }
+  // Phone format validation intentionally disabled for now.
+  // else if (itiInstance && !itiInstance.isValidNumber()) {
+  //   setCheckoutFieldError(checkoutPhone, checkoutPhoneError, "Please enter a valid mobile number.");
+  //   isValid = false;
+  // }
+
+  if (!emailVal) {
+    setCheckoutFieldError(checkoutEmail, checkoutEmailError, "Email is required.");
+    isValid = false;
+  } else if (!isValidCheckoutEmail(emailVal)) {
+    setCheckoutFieldError(checkoutEmail, checkoutEmailError, "Please enter a valid email.");
+    isValid = false;
+  }
+
+  /* if (!noteVal) {
+    setCheckoutFieldError(checkoutNote, checkoutNoteError, "Note is required.");
+    isValid = false;
+  } */
+
+  return isValid;
+}
+
+function getPhoneWithCountryCode() {
+  if (itiInstance) {
+    return itiInstance.getNumber();
+  }
+  return checkoutPhone.value.trim();
+}
+
+$$(".ms-card").forEach((card) => {
+  card.addEventListener("click", (event) => {
+    event.preventDefault();
+    openCheckoutModal(card);
+  });
+});
+
+checkoutClose?.addEventListener("click", closeCheckoutModal);
+checkoutOverlay?.addEventListener("click", (event) => {
+  if (event.target === checkoutOverlay) {
+    closeCheckoutModal();
+  }
+});
+
+paymentClose?.addEventListener("click", closePaymentStatus);
+paymentOverlay?.addEventListener("click", (event) => {
+  if (event.target === paymentOverlay) {
+    closePaymentStatus();
+  }
+});
+
+checkoutName?.addEventListener("input", () =>
+  clearCheckoutFieldError(checkoutName, checkoutNameError),
+);
+checkoutPhone?.addEventListener("input", (event) => {
+  const cleanedValue = sanitizePhoneInput(event.target.value);
+  if (event.target.value !== cleanedValue) {
+    event.target.value = cleanedValue;
+  }
+  clearCheckoutFieldError(checkoutPhone, checkoutPhoneError);
+});
+checkoutEmail?.addEventListener("input", () =>
+  clearCheckoutFieldError(checkoutEmail, checkoutEmailError),
+);
+checkoutNote?.addEventListener("input", () =>
+  clearCheckoutFieldError(checkoutNote, checkoutNoteError),
+);
+
+checkoutForm?.addEventListener("submit", (event) => {
+  event.preventDefault();
+
+  if (!validateCheckoutForm()) {
+    return;
+  }
+
+  const selectedCardData = selectedMentorshipCard
+    ? getSelectedCardData(selectedMentorshipCard)
+    : { title: "Unknown Plan", price: "", priceType: "" };
+
+  const checkoutPayload = {
+    selectedCard: selectedCardData,
+    name: checkoutName.value.trim(),
+    mobileNumber: getPhoneWithCountryCode(),
+    email: checkoutEmail.value.trim(),
+    note: checkoutNote.value.trim(),
+  };
+
+  console.log("Mentorship checkout submit:", checkoutPayload);
+
+  // TODO: Integrate your real payment gateway result here.
+  // Replace this with gateway callback response.
+  const paymentSuccess = true;
+
+  const modalExternalMessage = ""; //TODO: Add any content like transaction ID or anything else.
+
+  if (paymentSuccess) {
+    closeCheckoutModal();
+    showPaymentSuccessModal(modalExternalMessage);
+    checkoutForm.reset();
+    resetCheckoutValidation();
+    if (itiInstance) {
+      itiInstance.setCountry("ca");
+    }
+  } else {
+    closeCheckoutModal();
+    showPaymentFailedModal(modalExternalMessage);
+  }
+});

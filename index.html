@@ -12,6 +12,10 @@
       href="https://fonts.googleapis.com/css2?family=Allerta+Stencil&family=Almarai:wght@300;400;700;800&family=Keania+One&display=swap"
       rel="stylesheet"
     />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/intl-tel-input@25.3.1/build/css/intlTelInput.css"
+    />
 
     <link rel="stylesheet" href="css/style.css" />
   </head>
@@ -226,6 +230,71 @@
       </div><!-- /mentorship-inner -->
     </section>
 
+    <!-- ===== MENTORSHIP CHECKOUT MODAL ===== -->
+    <div class="checkout-overlay" id="checkoutOverlay" aria-hidden="true">
+      <div class="checkout-modal" role="dialog" aria-modal="true" aria-labelledby="checkoutTitle">
+        <button class="checkout-close" id="checkoutClose" aria-label="Close checkout modal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+
+        <h3 class="checkout-title" id="checkoutTitle">Checkout</h3>
+        <p class="checkout-selected" id="checkoutSelectedCard">
+          <span class="checkout-selected-label">Selected Plan:</span>
+          <span class="checkout-selected-plan">-</span>
+          <span class="checkout-selected-amount"></span>
+        </p>
+
+        <form id="checkoutForm" class="checkout-form" novalidate>
+          <div class="checkout-field">
+            <label for="checkoutName">Name</label>
+            <input type="text" id="checkoutName" name="name" placeholder="Enter your name" autocomplete="name" />
+            <span class="checkout-error" id="checkoutNameError"></span>
+          </div>
+
+          <div class="checkout-field">
+            <label for="checkoutPhone">Mobile Number</label>
+            <input type="tel" id="checkoutPhone" name="mobile" placeholder="Enter mobile number" autocomplete="tel" inputmode="numeric" pattern="[0-9\-\s]*" />
+            <span class="checkout-error" id="checkoutPhoneError"></span>
+          </div>
+
+          <div class="checkout-field">
+            <label for="checkoutEmail">Email</label>
+            <input type="email" id="checkoutEmail" name="email" placeholder="Enter your email" autocomplete="email" />
+            <span class="checkout-error" id="checkoutEmailError"></span>
+          </div>
+
+          <div class="checkout-field">
+            <label for="checkoutNote">Note</label>
+            <textarea id="checkoutNote" name="note" rows="4" placeholder="Write your note"></textarea>
+            <span class="checkout-error" id="checkoutNoteError"></span>
+          </div>
+
+          <div class="checkout-actions">
+            <button type="submit" class="checkout-submit-btn">Submit</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ===== PAYMENT STATUS MODAL ===== -->
+    <div class="payment-overlay" id="paymentOverlay" aria-hidden="true">
+      <div class="payment-modal" role="dialog" aria-modal="true" aria-labelledby="paymentStatusTitle">
+        <button class="payment-close" id="paymentClose" aria-label="Close payment status modal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+        <div class="payment-icon" id="paymentStatusIcon"></div>
+        <h3 class="payment-title" id="paymentStatusTitle">Payment Successful</h3>
+        <p class="payment-message" id="paymentStatusMessage">Payment successful. We will contact you soon.</p>
+        <p class="payment-external-message" id="paymentExternalMessage" hidden></p>
+      </div>
+    </div>
+
     <!-- ===== POPUP OVERLAY ===== -->
     <div class="popup-overlay" id="popupOverlay">
       <div class="popup" id="popup">
@@ -241,6 +310,7 @@
       </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@25.3.1/build/js/intlTelInput.min.js"></script>
     <script src="js/main.js"></script>
   </body>
 </html>
