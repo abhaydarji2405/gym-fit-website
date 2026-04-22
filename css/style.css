@@ -409,7 +409,7 @@ body {
    ============================================================ */
 [data-animate] {
   opacity: 0;
-  transition: opacity 0.7s ease, transform 0.7s ease;
+  transition: opacity 0.35s ease, transform 0.35s ease;
 }
 [data-animate="fade-left"]  { transform: translateX(-40px); }
 [data-animate="fade-right"] { transform: translateX(40px);  }
@@ -1206,6 +1206,157 @@ body {
 }
 
 /* ============================================================
+   ABOUT SECTION
+   ============================================================ */
+.about-section {
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(110deg, rgba(10, 10, 10, 0.78) 0%, rgba(10, 10, 10, 0.38) 48%, rgba(10, 10, 10, 0.72) 100%),
+    url('../assets/gym-background.png') center center / cover no-repeat;
+  padding: clamp(4.5rem, 11vh, 7rem) var(--pad-x);
+  isolation: isolate;
+}
+
+.about-section__overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent 28%, rgba(0, 0, 0, 0.2) 100%),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.08), transparent 38%, transparent 62%, rgba(255, 132, 76, 0.08));
+  pointer-events: none;
+  z-index: -1;
+}
+
+.about-section__lines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.about-section__line {
+  position: absolute;
+  left: 50%;
+  height: 3px;
+  border-radius: 999px;
+  transform: translateX(-50%);
+  background: linear-gradient(90deg, rgba(255, 122, 69, 0), rgba(255, 122, 69, 0.95) 20%, rgba(255, 166, 117, 0.95) 50%, rgba(255, 122, 69, 0.95) 80%, rgba(255, 122, 69, 0));
+  box-shadow: 0 0 12px rgba(255, 122, 69, 0.75), 0 0 28px rgba(255, 122, 69, 0.25);
+  opacity: 0.95;
+  animation: aboutLinePulse 1.2s ease-in-out infinite;
+}
+
+.about-section__line--lg {
+  top: 24px;
+  width: min(62vw, 500px);
+}
+
+.about-section__line--sm {
+  top: 84px;
+  width: min(46vw, 360px);
+  animation-delay: 0.7s;
+}
+
+@keyframes aboutLinePulse {
+  0%,
+  100% {
+    opacity: 0.7;
+    filter: brightness(0.95);
+  }
+  50% {
+    opacity: 1;
+    filter: brightness(1.1);
+  }
+}
+
+.about-section__inner {
+  position: relative;
+  z-index: 1;
+  max-width: 1320px;
+  margin: 0 auto;
+  min-height: clamp(420px, 62vh, 620px);
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  gap: clamp(2rem, 5vw, 4rem);
+}
+
+.about-card {
+  position: relative;
+  width: min(100%, 720px);
+  padding: clamp(1.6rem, 3vw, 2.6rem) clamp(1.3rem, 2.8vw, 2.2rem);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.68);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.22);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.about-card::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0;
+  height: 20%;
+  border-radius: 0 0 28px 28px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.18));
+  pointer-events: none;
+}
+
+.about-card__title {
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 4.2vw, 3rem);
+  line-height: 1.05;
+  color: #111;
+  letter-spacing: 1px;
+  margin-bottom: clamp(1rem, 2vw, 1.6rem);
+}
+
+.about-card__copy {
+  display: grid;
+  gap: 1rem;
+}
+
+.about-card__copy p {
+  color: rgba(17, 17, 17, 0.96);
+  font-size: clamp(0.98rem, 1.25vw, 1.45rem);
+  line-height: 1.28;
+  max-width: 100%;
+}
+
+.about-trainer {
+  position: relative;
+  justify-self: end;
+  width: min(100%, 340px);
+  margin-right: 3rem;
+}
+
+.about-trainer__glow {
+  position: absolute;
+  inset: 12% -8% 8% 18%;
+  border-radius: 30px;
+  background: radial-gradient(circle, rgba(255, 127, 80, 0.22) 0%, rgba(255, 127, 80, 0) 72%);
+  filter: blur(10px);
+}
+
+.about-trainer img {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  border-radius: 26px;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.28);
+  transition: transform 0.45s ease, box-shadow 0.45s ease;
+}
+
+.about-trainer:hover img {
+  transform: translateY(-8px) scale(1.015);
+  box-shadow: 0 28px 60px rgba(0, 0, 0, 0.34);
+}
+
+/* ============================================================
    MENTORSHIP – RESPONSIVE
    ============================================================ */
 
@@ -1217,13 +1368,28 @@ body {
   .ms-card-title {
     font-size: clamp(0.72rem, 1.4vw, 0.9rem);
   }
+
+  .about-section__inner {
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 340px);
+    gap: 1.5rem;
+  }
+
+  .about-card__copy p {
+    max-width: none;
+    line-height: 1.45;
+  }
 }
 
 /* Mobile (≤ 767px): single-card swipeable carousel */
 @media (max-width: 767px) {
+  .about-section__inner {
+    flex-direction: column ;
+  }
+
   .nav-links a {
     color: var(--black)
   }
+  
   .mentorship {
     padding-left: 3.5rem;
     padding-right: 3.5rem;
@@ -1291,6 +1457,47 @@ body {
   .ms-included-list li {
     font-size: 0.82rem;
   }
+
+  .about-section {
+    padding-top: 4.5rem;
+    padding-bottom: 4rem;
+  }
+
+  .about-section__line--lg {
+    top: 16px;
+    width: min(72vw, 380px);
+  }
+
+  .about-section__line--sm {
+    top: 66px;
+    width: min(54vw, 250px);
+  }
+
+  .about-section__inner {
+    min-height: auto;
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 1.5rem;
+  }
+
+  .about-card {
+    width: 100%;
+    border-radius: 24px;
+  }
+
+  .about-card__title {
+    font-size: clamp(1.8rem, 8vw, 2.4rem);
+  }
+
+  .about-card__copy p {
+    font-size: 1rem;
+  }
+
+  .about-trainer {
+    justify-self: center;
+    width: min(100%, 300px);
+    margin-right: 0;
+  }
 }
 
 /* Small mobile (≤ 480px) */
@@ -1303,5 +1510,36 @@ body {
   .ms-price-badge {
     font-size: 1.15rem;
     padding: 0.5rem 1.8rem;
+  }
+
+  .about-section {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .about-card {
+    padding: 1.25rem 1.05rem;
+    border-radius: 20px;
+  }
+
+  .about-card::after {
+    border-radius: 0 0 20px 20px;
+  }
+
+  .about-card__copy {
+    gap: 0.8rem;
+  }
+
+  .about-card__copy p {
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+
+  .about-trainer {
+    width: min(100%, 260px);
+  }
+
+  .about-trainer img {
+    border-radius: 20px;
   }
 }
