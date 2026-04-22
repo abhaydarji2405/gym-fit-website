@@ -544,10 +544,13 @@ function getPhoneWithCountryCode() {
   return checkoutPhone.value.trim();
 }
 
-$$(".ms-card").forEach((card) => {
-  card.addEventListener("click", (event) => {
+$$(".ms-learn-btn").forEach((btn) => {
+  btn.addEventListener("click", (event) => {
     event.preventDefault();
-    openCheckoutModal(card);
+    const card = event.currentTarget.closest(".ms-card");
+    if (card) {
+      openCheckoutModal(card);
+    }
   });
 });
 
