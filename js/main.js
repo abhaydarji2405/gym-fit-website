@@ -29,7 +29,7 @@ animEls.forEach((el, i) => {
   // If element has an explicit delay attribute, honour it; otherwise stagger
   const customDelay = el.dataset.animateDelay;
   el.style.transitionDelay =
-    customDelay !== undefined ? `${customDelay}s` : `${i * 0.8}s`;
+    customDelay !== undefined ? `${customDelay}s` : `${i * 0.2}s`;
   observer.observe(el);
 });
 

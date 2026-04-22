@@ -8,6 +8,8 @@
   --black:   #0d0d0d;
   --dark-bg: rgba(13, 13, 13, 0.72);
   --input-bg: rgba(255, 255, 255, 0.92);
+  --gray:   #363131;
+  --gray-light: #dddddd;
   --accent:  #000000;
   --error:   #ff4d4d;
   --success: #22c55e;
@@ -46,20 +48,20 @@ body {
 }
 
 .nav-inner {
-  background: var(--white);
+  background: var(--black);
   border-radius: 16px;
   width: 100%;
   height: 60px;
   display: flex;
   align-items: center;
-  padding: 0 35px;
+  padding: 0 0px;
   box-shadow: 0 4px 30px rgba(0,0,0,0.35);
 }
 
 .nav-logo {
   font-family: var(--font-logo);
   font-size: clamp(1.5rem, 2.8vw, 2.1rem);
-  color: var(--black);
+  color: var(--white);
   text-decoration: none;
   margin-right: auto;
   letter-spacing: 0.5px;
@@ -76,7 +78,7 @@ body {
 .nav-links a {
   font-family: var(--font-body);
   font-size: clamp(0.85rem, 1.4vw, 1.2rem);
-  color: var(--black);
+  color: var(--white);
   text-decoration: none;
   position: relative;
   padding-bottom: 3px;
@@ -88,11 +90,11 @@ body {
   position: absolute;
   bottom: 0; left: 0;
   width: 0; height: 2px;
-  background: var(--black);
+  background: var(--white);
   transition: width 0.3s ease;
 }
 .nav-links a:hover::after { width: 100%; }
-.nav-links a:hover { color: #333; }
+.nav-links a:hover { color: var(--gray-light); }
 
 /* Hamburger */
 .hamburger {
@@ -108,7 +110,7 @@ body {
 .hamburger span {
   display: block;
   height: 2px; width: 100%;
-  background: var(--black);
+  background: var(--white);
   border-radius: 2px;
   transition: transform 0.3s, opacity 0.3s;
 }
@@ -150,7 +152,8 @@ body {
 .hero-bg {
   position: absolute;
   inset: 0;
-  background: url('../assets/hero-background.png') center center / cover no-repeat;
+  background-color: #000000;
+  /* background: url('../assets/hero-background.png') center center / cover no-repeat; */
   z-index: 0;
 }
 .hero-bg::after {
@@ -265,7 +268,7 @@ body {
   width: fit-content;
   min-width: 160px;
   height: 52px;
-  background: var(--black);
+  background: var(--gray);
   color: var(--white);
   border: 2px solid var(--white);
   border-radius: 10px;
@@ -883,6 +886,9 @@ body {
 
 /* Mobile (≤ 767px): single-card swipeable carousel */
 @media (max-width: 767px) {
+  .nav-links a {
+    color: var(--black)
+  }
   .mentorship {
     padding-left: 3.5rem;
     padding-right: 3.5rem;
