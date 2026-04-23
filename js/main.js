@@ -80,7 +80,8 @@ function goTo(index) {
 }
 
 function startAutoPlay() {
-  autoPlay = setInterval(() => goTo(current + 1), 4000);
+  // TODO: SLIDER AUTOPLAY TIMING
+  autoPlay = setInterval(() => goTo(current + 1), 2000);
 }
 
 function stopAutoPlay() {
@@ -295,9 +296,13 @@ form?.addEventListener("submit", async (e) => {
     subscribedAt: new Date().toISOString(),
   };
 
-  // TODO: Subscriber Form
+  // TODO: HERO SECTION SUBSCRIBE
 
   // await new Promise((resolve) => setTimeout(resolve, 5000));
+
+  
+  // Log for debug
+  console.log("New subscriber:", subscriber);
 
   const isSuccess = true;
 
@@ -309,9 +314,6 @@ form?.addEventListener("submit", async (e) => {
     }
     return;
   }
-
-  // Log for debug
-  console.log("New subscriber:", subscriber);
 
   // ---- Success ----
   showPopup(
@@ -679,6 +681,7 @@ checkoutForm?.addEventListener("submit", async (event) => {
 
   console.log("Mentorship checkout submit:", checkoutPayload);
 
+  // TODO: PAYMENT SUBMIT
   // await new Promise((resolve) => setTimeout(resolve, 5000));
 
   // TODO: Integrate your real payment gateway result here.
@@ -849,6 +852,8 @@ floatingQueryForm?.addEventListener("submit", async (event) => {
   };
 
   console.log("Have Question submit:", queryPayload);
+  // TODO: FLOATING QUERY SUBMIT
+
   // await new Promise((resolve) => setTimeout(resolve, 5000));
   const isSuccess = true;
 
