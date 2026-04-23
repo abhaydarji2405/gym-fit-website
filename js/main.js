@@ -159,9 +159,9 @@ function showPopup(type, title, message) {
   popupMsg.textContent = message;
   overlay.classList.add("active");
 
-  // Auto-close success after 4 s
+  // Auto-close success after 10 s
   if (type === "success") {
-    setTimeout(closePopup, 4000);
+    setTimeout(closePopup, 10000);
   }
 }
 
@@ -182,12 +182,38 @@ const firstNameInput = $("#firstName");
 const emailInput = $("#email");
 const firstNameError = $("#firstNameError");
 const emailError = $("#emailError");
+const heroSubmitError = $("#heroSubmitError");
+const heroSubmitBtn = $("#heroSubmitBtn");
+
+let isHeroSubscribeLoading = false;
+
+function setHeroSubscribeLoadingState(isLoading) {
+  isHeroSubscribeLoading = isLoading;
+
+  if (!heroSubmitBtn) {
+    return;
+  }
+
+  heroSubmitBtn.disabled = isLoading;
+  heroSubmitBtn.classList.toggle("is-loading", isLoading);
+  heroSubmitBtn.setAttribute("aria-busy", String(isLoading));
+}
 
 // Live: clear error as user types
 firstNameInput?.addEventListener("input", () =>
   clearError(firstNameInput, firstNameError),
 );
 emailInput?.addEventListener("input", () => clearError(emailInput, emailError));
+firstNameInput?.addEventListener("input", () => {
+  if (heroSubmitError) {
+    heroSubmitError.textContent = "";
+  }
+});
+emailInput?.addEventListener("input", () => {
+  if (heroSubmitError) {
+    heroSubmitError.textContent = "";
+  }
+});
 
 function clearError(input, errorEl) {
   input.classList.remove("error-field");
@@ -210,12 +236,20 @@ function isValidEmail(val) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val.trim());
 }
 
-form?.addEventListener("submit", (e) => {
+form?.addEventListener("submit", async (e) => {
   e.preventDefault();
+
+  if (isHeroSubscribeLoading) {
+    return;
+  }
 
   const firstName = firstNameInput.value.trim();
   const email = emailInput.value.trim();
   let valid = true;
+
+  if (heroSubmitError) {
+    heroSubmitError.textContent = "";
+  }
 
   // --- Validate First Name ---
   if (!firstName) {
@@ -252,6 +286,8 @@ form?.addEventListener("submit", (e) => {
     return;
   }
 
+  setHeroSubscribeLoadingState(true);
+
   // ---- Store subscriber data ----
   const subscriber = {
     firstName,
@@ -260,6 +296,19 @@ form?.addEventListener("submit", (e) => {
   };
 
   // TODO: Subscriber Form
+
+  // await new Promise((resolve) => setTimeout(resolve, 5000));
+
+  const isSuccess = true;
+
+  if (!isSuccess) {
+    setHeroSubscribeLoadingState(false);
+    if (heroSubmitError) {
+      heroSubmitError.textContent =
+        "Something went wrong. Please try again in a moment.";
+    }
+    return;
+  }
 
   // Log for debug
   console.log("New subscriber:", subscriber);
@@ -275,6 +324,10 @@ form?.addEventListener("submit", (e) => {
   form.reset();
   clearError(firstNameInput, firstNameError);
   clearError(emailInput, emailError);
+  if (heroSubmitError) {
+    heroSubmitError.textContent = "";
+  }
+  setHeroSubscribeLoadingState(false);
 });
 
 /* ============================================================
@@ -354,6 +407,7 @@ const checkoutOverlay = $("#checkoutOverlay");
 const checkoutModal = $(".checkout-modal");
 const checkoutClose = $("#checkoutClose");
 const checkoutForm = $("#checkoutForm");
+const checkoutSubmitBtn = $("#checkoutSubmitBtn");
 const checkoutSelectedCard = $("#checkoutSelectedCard");
 
 const checkoutName = $("#checkoutName");
@@ -376,6 +430,19 @@ const paymentExternalMessage = $("#paymentExternalMessage");
 
 let selectedMentorshipCard = null;
 let itiInstance = null;
+let isCheckoutLoading = false;
+
+function setCheckoutLoadingState(isLoading) {
+  isCheckoutLoading = isLoading;
+
+  if (!checkoutSubmitBtn) {
+    return;
+  }
+
+  checkoutSubmitBtn.disabled = isLoading;
+  checkoutSubmitBtn.classList.toggle("is-loading", isLoading);
+  checkoutSubmitBtn.setAttribute("aria-busy", String(isLoading));
+}
 
 if (window.intlTelInput && checkoutPhone) {
   itiInstance = window.intlTelInput(checkoutPhone, {
@@ -585,12 +652,18 @@ checkoutNote?.addEventListener("input", () =>
   clearCheckoutFieldError(checkoutNote, checkoutNoteError),
 );
 
-checkoutForm?.addEventListener("submit", (event) => {
+checkoutForm?.addEventListener("submit", async (event) => {
   event.preventDefault();
+
+  if (isCheckoutLoading) {
+    return;
+  }
 
   if (!validateCheckoutForm()) {
     return;
   }
+
+  setCheckoutLoadingState(true);
 
   const selectedCardData = selectedMentorshipCard
     ? getSelectedCardData(selectedMentorshipCard)
@@ -606,6 +679,8 @@ checkoutForm?.addEventListener("submit", (event) => {
 
   console.log("Mentorship checkout submit:", checkoutPayload);
 
+  // await new Promise((resolve) => setTimeout(resolve, 5000));
+
   // TODO: Integrate your real payment gateway result here.
   // Replace this with gateway callback response.
   const paymentSuccess = true;
@@ -613,6 +688,7 @@ checkoutForm?.addEventListener("submit", (event) => {
   const modalExternalMessage = ""; //TODO: Add any content like transaction ID or anything else.
 
   if (paymentSuccess) {
+    setCheckoutLoadingState(false);
     closeCheckoutModal();
     showPaymentSuccessModal(modalExternalMessage);
     checkoutForm.reset();
@@ -621,7 +697,175 @@ checkoutForm?.addEventListener("submit", (event) => {
       itiInstance.setCountry("ca");
     }
   } else {
+    setCheckoutLoadingState(false);
     closeCheckoutModal();
     showPaymentFailedModal(modalExternalMessage);
+  }
+});
+
+/* ============================================================
+   8. FLOATING QUERY WIDGET
+   ============================================================ */
+const floatingQueryBtn = $("#floatingQueryBtn");
+const floatingQueryOverlay = $("#floatingQueryOverlay");
+const floatingQueryClose = $("#floatingQueryClose");
+const floatingQueryContent = $("#floatingQueryContent");
+const floatingQueryForm = $("#floatingQueryForm");
+const floatingQuerySuccess = $("#floatingQuerySuccess");
+const floatingQuerySubmitError = $("#floatingQuerySubmitError");
+const floatingQuerySubmitBtn = $("#floatingQuerySubmitBtn");
+
+const queryName = $("#queryName");
+const queryEmail = $("#queryEmail");
+const queryMessage = $("#queryMessage");
+
+const queryNameError = $("#queryNameError");
+const queryEmailError = $("#queryEmailError");
+const queryMessageError = $("#queryMessageError");
+
+let isFloatingQueryLoading = false;
+
+function setFloatingQueryLoadingState(isLoading) {
+  isFloatingQueryLoading = isLoading;
+
+  if (!floatingQuerySubmitBtn) {
+    return;
+  }
+
+  floatingQuerySubmitBtn.disabled = isLoading;
+  floatingQuerySubmitBtn.classList.toggle("is-loading", isLoading);
+  floatingQuerySubmitBtn.setAttribute("aria-busy", String(isLoading));
+}
+
+function clearQueryFieldError(input, errorEl) {
+  input?.classList.remove("error-field");
+  if (errorEl) {
+    errorEl.textContent = "";
+  }
+}
+
+function setQueryFieldError(input, errorEl, message) {
+  input?.classList.add("error-field");
+  if (errorEl) {
+    errorEl.textContent = message;
+  }
+}
+
+function resetFloatingQueryWidget() {
+  floatingQueryForm?.reset();
+  floatingQuerySubmitError.textContent = "";
+  setFloatingQueryLoadingState(false);
+  clearQueryFieldError(queryName, queryNameError);
+  clearQueryFieldError(queryEmail, queryEmailError);
+  clearQueryFieldError(queryMessage, queryMessageError);
+
+  if (floatingQueryContent) {
+    floatingQueryContent.hidden = false;
+  }
+  if (floatingQuerySuccess) {
+    floatingQuerySuccess.hidden = true;
+  }
+}
+
+function openFloatingQueryWidget() {
+  floatingQueryOverlay.classList.add("active");
+  floatingQueryOverlay.setAttribute("aria-hidden", "false");
+}
+
+function closeFloatingQueryWidget() {
+  floatingQueryOverlay.classList.remove("active");
+  floatingQueryOverlay.setAttribute("aria-hidden", "true");
+  resetFloatingQueryWidget();
+}
+
+function validateFloatingQueryForm() {
+  const nameVal = queryName.value.trim();
+  const emailVal = queryEmail.value.trim();
+  const questionVal = queryMessage.value.trim();
+  let isValid = true;
+
+  clearQueryFieldError(queryName, queryNameError);
+  clearQueryFieldError(queryEmail, queryEmailError);
+  clearQueryFieldError(queryMessage, queryMessageError);
+  floatingQuerySubmitError.textContent = "";
+
+  if (!nameVal) {
+    setQueryFieldError(queryName, queryNameError, "Name is required.");
+    isValid = false;
+  }
+
+  if (!emailVal) {
+    setQueryFieldError(queryEmail, queryEmailError, "Email is required.");
+    isValid = false;
+  } else if (!isValidCheckoutEmail(emailVal)) {
+    setQueryFieldError(queryEmail, queryEmailError, "Please enter a valid email.");
+    isValid = false;
+  }
+
+  if (!questionVal) {
+    setQueryFieldError(queryMessage, queryMessageError, "Question is required.");
+    isValid = false;
+  }
+
+  return isValid;
+}
+
+floatingQueryBtn?.addEventListener("click", openFloatingQueryWidget);
+floatingQueryClose?.addEventListener("click", closeFloatingQueryWidget);
+
+floatingQueryOverlay?.addEventListener("click", (event) => {
+  if (event.target === floatingQueryOverlay) {
+    closeFloatingQueryWidget();
+  }
+});
+
+queryName?.addEventListener("input", () =>
+  clearQueryFieldError(queryName, queryNameError),
+);
+queryEmail?.addEventListener("input", () =>
+  clearQueryFieldError(queryEmail, queryEmailError),
+);
+queryMessage?.addEventListener("input", () =>
+  clearQueryFieldError(queryMessage, queryMessageError),
+);
+
+floatingQueryForm?.addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  if (isFloatingQueryLoading) {
+    return;
+  }
+
+  if (!validateFloatingQueryForm()) {
+    return;
+  }
+
+  setFloatingQueryLoadingState(true);
+
+  const queryPayload = {
+    name: queryName.value.trim(),
+    email: queryEmail.value.trim(),
+    question: queryMessage.value.trim(),
+  };
+
+  console.log("Have Question submit:", queryPayload);
+  // await new Promise((resolve) => setTimeout(resolve, 5000));
+  const isSuccess = true;
+
+  if (!isSuccess) {
+    setFloatingQueryLoadingState(false);
+    floatingQuerySubmitError.textContent =
+      "Something went wrong. Please try again in a moment.";
+    return;
+  }
+
+  floatingQuerySubmitError.textContent = "";
+  setFloatingQueryLoadingState(false);
+
+  if (floatingQueryContent) {
+    floatingQueryContent.hidden = true;
+  }
+  if (floatingQuerySuccess) {
+    floatingQuerySuccess.hidden = false;
   }
 });

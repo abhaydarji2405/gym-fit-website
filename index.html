@@ -74,7 +74,13 @@
                 <span class="field-error" id="emailError"></span>
               </div>
             </div>
-            <button type="submit" class="btn-subscribe"><span>SUBSCRIBE</span></button>
+            <p class="hero-submit-error" id="heroSubmitError" aria-live="polite"></p>
+            <button type="submit" class="btn-subscribe hero-submit-btn" id="heroSubmitBtn">
+              <span class="hero-submit-btn__label">SUBSCRIBE</span>
+              <span class="hero-submit-btn__loader" aria-hidden="true">
+                <span class="hero-submit-btn__loader-line"></span>
+              </span>
+            </button>
           </form>
 
           <p class="hero-quote">"Join the tribe, learning new stuff"</p>
@@ -415,7 +421,12 @@
           </div>
 
           <div class="checkout-actions">
-            <button type="submit" class="checkout-submit-btn">Submit</button>
+            <button type="submit" class="checkout-submit-btn checkout-submit-btn--loading" id="checkoutSubmitBtn">
+              <span class="checkout-submit-btn__label">Submit</span>
+              <span class="checkout-submit-btn__loader" aria-hidden="true">
+                <span class="checkout-submit-btn__loader-line"></span>
+              </span>
+            </button>
           </div>
         </form>
       </div>
@@ -450,6 +461,64 @@
         <h3 class="popup-title" id="popupTitle"></h3>
         <p class="popup-msg" id="popupMsg"></p>
       </div>
+    </div>
+
+    <!-- ===== FLOATING QUERY WIDGET ===== -->
+    <button class="floating-query-btn" id="floatingQueryBtn" aria-label="Open query form">
+      Have Questions?
+    </button>
+
+    <div class="floating-query-overlay" id="floatingQueryOverlay" aria-hidden="true">
+      <aside class="floating-query-widget" role="dialog" aria-modal="true" aria-labelledby="floatingQueryTitle">
+        <button class="floating-query-close" id="floatingQueryClose" aria-label="Close query widget">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+
+        <div class="floating-query-content" id="floatingQueryContent">
+          <h3 class="floating-query-title" id="floatingQueryTitle">Have Questions?</h3>
+          <p class="floating-query-subtitle">Write us your query</p>
+
+          <form class="floating-query-form" id="floatingQueryForm" novalidate>
+            <div class="checkout-field">
+              <label for="queryName">Name</label>
+              <input type="text" id="queryName" name="name" placeholder="Enter your name" autocomplete="name" />
+              <span class="checkout-error" id="queryNameError"></span>
+            </div>
+
+            <div class="checkout-field">
+              <label for="queryEmail">Email</label>
+              <input type="email" id="queryEmail" name="email" placeholder="Enter your email" autocomplete="email" />
+              <span class="checkout-error" id="queryEmailError"></span>
+            </div>
+
+            <div class="checkout-field">
+              <label for="queryMessage">Question</label>
+              <textarea id="queryMessage" name="question" rows="4" placeholder="Write your question"></textarea>
+              <span class="checkout-error" id="queryMessageError"></span>
+            </div>
+
+            <p class="floating-query-submit-error" id="floatingQuerySubmitError" aria-live="polite"></p>
+
+            <div class="checkout-actions">
+              <button type="submit" class="checkout-submit-btn floating-query-submit-btn" id="floatingQuerySubmitBtn" style="margin-top: 0;">
+                <span class="floating-query-submit-btn__label">Submit Query</span>
+                <span class="floating-query-submit-btn__loader" aria-hidden="true">
+                  <span class="floating-query-submit-btn__loader-line"></span>
+                </span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <div class="floating-query-success" id="floatingQuerySuccess" hidden>
+          <div class="floating-query-success-icon" aria-hidden="true">&#10003;</div>
+          <h4>Query Sent Successfully</h4>
+          <p>Thanks for contacting us. Our team will get back to you shortly.</p>
+        </div>
+      </aside>
     </div>
 
     <!-- ===== FOOTER ===== -->

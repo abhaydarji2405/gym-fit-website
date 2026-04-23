@@ -212,7 +212,6 @@ body {
 .form-row {
   display: flex;
   gap: 16px;
-  margin-bottom: 16px;
   flex-wrap: wrap;
 }
 
@@ -291,10 +290,96 @@ body {
   transition: transform 0.3s ease;
   z-index: 0;
 }
-.btn-subscribe span { position: relative; z-index: 1; }
+.btn-subscribe span { z-index: 1; }
 .btn-subscribe:hover::before { transform: scaleX(1); }
 .btn-subscribe:hover { color: var(--black); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255,255,255,0.15); }
 .btn-subscribe:active { transform: translateY(0) scale(0.97); }
+
+.hero-submit-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-submit-btn__label {
+  position: relative;
+  z-index: 1;
+  transition: opacity 0.18s ease;
+}
+
+.hero-submit-btn__loader {
+  position: absolute;
+  inset: 50% 1.2rem auto;
+  transform: translateY(-50%);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+.hero-submit-btn__loader-line {
+  width: 70%;
+  height: 3px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.22);
+  overflow: hidden;
+  position: relative;
+}
+
+.hero-submit-btn__loader-line::after {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 -45%;
+  width: 45%;
+  border-radius: inherit;
+  background: #ffffff;
+  animation: floatingQueryLineLoader 0.9s ease-in-out infinite;
+}
+
+.hero-submit-btn.is-loading {
+  cursor: wait;
+  opacity: 0.9;
+}
+
+.hero-submit-btn.is-loading::before {
+  transform: scaleX(0);
+}
+
+.hero-submit-btn.is-loading:hover {
+  color: var(--white);
+  transform: none;
+  box-shadow: none;
+}
+
+.hero-submit-btn.is-loading .hero-submit-btn__loader {
+  display: inline-flex;
+  width: calc(100% - 2.4rem);
+}
+
+.hero-submit-btn.is-loading .hero-submit-btn__label {
+  opacity: 0;
+}
+
+.hero-submit-btn:disabled {
+  pointer-events: none;
+}
+
+.hero-submit-error {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  margin: 0;
+  color: var(--error);
+  font-size: 0.82rem;
+  font-weight: 700;
+  transition: max-height 0.2s ease, opacity 0.2s ease, margin 0.2s ease;
+}
+
+.hero-submit-error:not(:empty) {
+  max-height: 15px;
+  opacity: 1;
+  margin: -0.1rem 0 0.7rem;
+}
 
 .hero-quote {
   font-size: clamp(0.95rem, 1.6vw, 1.1rem);
@@ -687,11 +772,71 @@ body {
   font-size: 0.95rem;
   cursor: pointer;
   transition: background 0.2s ease, transform 0.2s ease;
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .checkout-submit-btn:hover {
   background: #2b2b2b;
   transform: translateY(-1px);
+}
+
+.checkout-submit-btn__label {
+  transition: opacity 0.18s ease;
+}
+
+.checkout-submit-btn__loader {
+  position: absolute;
+  inset: 50% 1.2rem auto;
+  transform: translateY(-50%);
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.checkout-submit-btn__loader-line {
+  width: 70%;
+  height: 3px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.22);
+  overflow: hidden;
+  position: relative;
+}
+
+.checkout-submit-btn__loader-line::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 -45%;
+  width: 45%;
+  border-radius: inherit;
+  background: #ffffff;
+  animation: floatingQueryLineLoader 0.9s ease-in-out infinite;
+}
+
+.checkout-submit-btn.is-loading {
+  cursor: wait;
+  opacity: 0.9;
+}
+
+.checkout-submit-btn.is-loading:hover {
+  background: #0f0f0f;
+  transform: none;
+}
+
+.checkout-submit-btn.is-loading .checkout-submit-btn__loader {
+  display: inline-flex;
+  width: calc(100% - 2.4rem);
+}
+
+.checkout-submit-btn.is-loading .checkout-submit-btn__label {
+  opacity: 0;
+}
+
+.checkout-submit-btn:disabled {
+  pointer-events: none;
 }
 
 .payment-modal {
@@ -817,6 +962,282 @@ body {
 }
 
 /* ============================================================
+   FLOATING QUERY WIDGET
+   ============================================================ */
+.floating-query-btn {
+  position: fixed;
+  right: clamp(0.85rem, 2.2vw, 1.5rem);
+  bottom: clamp(1rem, 2.8vh, 1.8rem);
+  z-index: 240;
+  min-height: 52px;
+  border: 2px solid #ffffff;
+  border-radius: 999px;
+  padding: 0.78rem 1.35rem;
+  background: linear-gradient(125deg, #1e1e1e 0%, #2b2b2b 52%, #3a3a3a 100%);
+  color: #ffffff;
+  font-family: var(--font-heading);
+  letter-spacing: 1px;
+  font-size: clamp(0.8rem, 1.6vw, 0.92rem);
+  cursor: pointer;
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.34), 0 0 0 1px rgba(255, 255, 255, 0.14) inset;
+  transition: transform 0.22s ease, box-shadow 0.22s ease, filter 0.22s ease;
+  animation: floatingPulse 3.2s ease-in-out infinite;
+}
+
+.floating-query-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 22px 42px rgba(0, 0, 0, 0.42), 0 0 0 1px rgba(255, 255, 255, 0.2) inset;
+  filter: saturate(1.08);
+}
+
+.floating-query-btn:active {
+  transform: translateY(0) scale(0.97);
+}
+
+@keyframes floatingPulse {
+  0%,
+  100% {
+    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.34), 0 0 0 1px rgba(255, 255, 255, 0.14) inset;
+  }
+  50% {
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.42), 0 0 0 1px rgba(255, 255, 255, 0.2) inset;
+  }
+}
+
+.floating-query-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 255;
+  background: rgba(7, 7, 7, 0.42);
+  backdrop-filter: blur(3px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.24s ease, visibility 0.24s ease;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  padding: clamp(1rem, 3vw, 1.5rem);
+}
+
+.floating-query-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.floating-query-widget {
+  width: min(430px, 100%);
+  background: #ffffff;
+  color: #111111;
+  border: 1px solid #e4e4e4;
+  border-radius: 18px;
+  box-shadow: 0 24px 54px rgba(0, 0, 0, 0.28);
+  padding: clamp(1rem, 2.8vw, 1.4rem);
+  position: relative;
+  transform: translateY(24px) scale(0.96);
+  opacity: 0;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.22s ease;
+}
+
+.floating-query-overlay.active .floating-query-widget {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+
+.floating-query-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 50%;
+  background: #f2f2f2;
+  color: #181818;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.floating-query-close svg {
+  width: 16px;
+  height: 16px;
+}
+
+.floating-query-close:hover {
+  background: #e7e7e7;
+  transform: rotate(90deg);
+}
+
+.floating-query-title {
+  font-family: var(--font-heading);
+  font-size: clamp(1.08rem, 2.25vw, 1.35rem);
+  letter-spacing: 0.7px;
+  color: #111111;
+  max-width: calc(100% - 36px);
+  line-height: 1.25;
+}
+
+.floating-query-subtitle {
+  margin-top: 0.3rem;
+  color: #5c5c5c;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.floating-query-content[hidden],
+.floating-query-form[hidden],
+.floating-query-success[hidden] {
+  display: none !important;
+}
+
+.floating-query-form {
+  margin-top: 0.62rem;
+  display: grid;
+  gap: 0.48rem;
+}
+
+.floating-query-form .checkout-field {
+  gap: 0.2rem;
+}
+
+.floating-query-form .checkout-field textarea {
+  min-height: 112px;
+}
+
+.floating-query-submit-btn {
+  position: relative;
+  min-width: 190px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.floating-query-submit-btn__label {
+  transition: opacity 0.18s ease;
+}
+
+.floating-query-submit-btn__loader {
+  position: absolute;
+  inset: 50% 1.2rem auto;
+  transform: translateY(-50%);
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.floating-query-submit-btn__loader-line {
+  width: 70%;
+  height: 3px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.22);
+  overflow: hidden;
+  position: relative;
+}
+
+.floating-query-submit-btn__loader-line::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 -45%;
+  width: 45%;
+  border-radius: inherit;
+  background: #ffffff;
+  animation: floatingQueryLineLoader 0.9s ease-in-out infinite;
+}
+
+.floating-query-submit-btn.is-loading {
+  cursor: wait;
+  opacity: 0.9;
+}
+
+.floating-query-submit-btn.is-loading .floating-query-submit-btn__loader {
+  display: inline-flex;
+  width: calc(100% - 2.4rem);
+}
+
+.floating-query-submit-btn.is-loading .floating-query-submit-btn__label {
+  opacity: 0;
+}
+
+.floating-query-submit-btn:disabled {
+  pointer-events: none;
+}
+
+.floating-query-submit-error {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  font-size: 0.8rem;
+  color: var(--error);
+  font-weight: 700;
+  margin-top: 0;
+  transition: max-height 0.2s ease, opacity 0.2s ease, margin-top 0.2s ease;
+}
+
+.floating-query-submit-error:not(:empty) {
+  max-height: 36px;
+  opacity: 1;
+  margin-top: -0.2rem;
+}
+
+.floating-query-success {
+  margin-top: 1rem;
+  text-align: center;
+  padding: 1.15rem 0.6rem 0.8rem;
+  animation: querySuccessIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.floating-query-success-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 0.9rem;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(circle at 30% 20%, #2fc56f 0%, #0f8b40 100%);
+  color: #ffffff;
+  font-size: 2rem;
+  font-weight: 800;
+  box-shadow: 0 10px 24px rgba(15, 139, 64, 0.35);
+}
+
+.floating-query-success h4 {
+  font-family: var(--font-heading);
+  color: #15803d;
+  font-size: clamp(1.02rem, 2vw, 1.25rem);
+  letter-spacing: 0.4px;
+}
+
+.floating-query-success p {
+  margin-top: 0.45rem;
+  color: #484848;
+  line-height: 1.6;
+  font-size: 0.92rem;
+}
+
+@keyframes querySuccessIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes floatingQueryLineLoader {
+  0% {
+    left: -45%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* ============================================================
    RESPONSIVE
    ============================================================ */
 
@@ -874,6 +1295,14 @@ body {
 
   .checkout-submit-btn {
     width: 100%;
+  }
+
+  .floating-query-overlay {
+    align-items: flex-end;
+  }
+
+  .floating-query-widget {
+    border-radius: 14px;
   }
 
   /* Restore symmetric padding; slider will negate it */
@@ -942,6 +1371,18 @@ body {
   .checkout-overlay,
   .payment-overlay {
     padding: 0.8rem;
+  }
+
+  .floating-query-btn {
+    right: 0.75rem;
+    bottom: 0.85rem;
+    min-height: 46px;
+    padding: 0.62rem 1rem;
+    font-size: 0.72rem;
+  }
+
+  .floating-query-overlay {
+    padding: 0.75rem;
   }
 }
 
