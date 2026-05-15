@@ -53,98 +53,7 @@ $$(".nav-links a").forEach((a) =>
 );
 
 /* ============================================================
-   3. SLIDER
-   ============================================================ */
-const track = $("#sliderTrack");
-const prevBtn = $("#prevBtn");
-const nextBtn = $("#nextBtn");
-const slides = $$(".slide", track);
-const total = slides.length;
-let current = 0;
-let autoPlay = null;
-
-function getSlideWidth() {
-  // Each slide is 84% of viewport minus gap; match CSS gap: 18px
-  return slides[0].getBoundingClientRect().width + 18;
-}
-
-function goTo(index) {
-  current = (index + total) % total;
-
-  // Move track
-  const offset = current * getSlideWidth();
-  track.style.transform = `translateX(-${offset}px)`;
-
-  // Active class for brightness effect
-  slides.forEach((s, i) => s.classList.toggle("active", i === current));
-}
-
-function startAutoPlay() {
-  // TODO: SLIDER AUTOPLAY TIMING
-  autoPlay = setInterval(() => goTo(current + 1), 2000);
-}
-
-function stopAutoPlay() {
-  clearInterval(autoPlay);
-}
-
-nextBtn?.addEventListener("click", () => {
-  stopAutoPlay();
-  goTo(current + 1);
-  startAutoPlay();
-});
-prevBtn?.addEventListener("click", () => {
-  stopAutoPlay();
-  goTo(current - 1);
-  startAutoPlay();
-});
-
-// Keyboard navigation
-document.addEventListener("keydown", (e) => {
-  if (e.key === "ArrowRight") {
-    stopAutoPlay();
-    goTo(current + 1);
-    startAutoPlay();
-  }
-  if (e.key === "ArrowLeft") {
-    stopAutoPlay();
-    goTo(current - 1);
-    startAutoPlay();
-  }
-});
-
-// Touch / swipe support
-let touchStartX = 0;
-track?.addEventListener(
-  "touchstart",
-  (e) => {
-    touchStartX = e.touches[0].clientX;
-  },
-  { passive: true },
-);
-
-track?.addEventListener("touchend", (e) => {
-  const delta = touchStartX - e.changedTouches[0].clientX;
-  if (Math.abs(delta) > 40) {
-    stopAutoPlay();
-    delta > 0 ? goTo(current + 1) : goTo(current - 1);
-    startAutoPlay();
-  }
-});
-
-// Recalculate on resize (slide widths change with viewport)
-let resizeTimer;
-window.addEventListener("resize", () => {
-  clearTimeout(resizeTimer);
-  resizeTimer = setTimeout(() => goTo(current), 100);
-});
-
-// Init
-goTo(0);
-startAutoPlay();
-
-/* ============================================================
-   4. POPUP HELPERS
+   3. POPUP HELPERS
    ============================================================ */
 const overlay = $("#popupOverlay");
 const popup = $("#popup");
@@ -176,7 +85,7 @@ overlay?.addEventListener("click", (e) => {
 });
 
 /* ============================================================
-   5. FORM VALIDATION & SUBMISSION
+  4. FORM VALIDATION & SUBMISSION
    ============================================================ */
 const form = $("#subscribeForm");
 const firstNameInput = $("#firstName");
@@ -431,7 +340,6 @@ const paymentStatusMessage = $("#paymentStatusMessage");
 const paymentExternalMessage = $("#paymentExternalMessage");
 
 let selectedMentorshipCard = null;
-let itiInstance = null;
 let isCheckoutLoading = false;
 
 function setCheckoutLoadingState(isLoading) {
@@ -444,18 +352,6 @@ function setCheckoutLoadingState(isLoading) {
   checkoutSubmitBtn.disabled = isLoading;
   checkoutSubmitBtn.classList.toggle("is-loading", isLoading);
   checkoutSubmitBtn.setAttribute("aria-busy", String(isLoading));
-}
-
-if (window.intlTelInput && checkoutPhone) {
-  itiInstance = window.intlTelInput(checkoutPhone, {
-    initialCountry: "ca",
-    nationalMode: true,
-    autoPlaceholder: "aggressive",
-    strictMode: false,
-    separateDialCode: true,
-    utilsScript:
-      "https://cdn.jsdelivr.net/npm/intl-tel-input@25.3.1/build/js/utils.js",
-  });
 }
 
 function clearCheckoutFieldError(input, errorEl) {
@@ -482,8 +378,8 @@ function resetCheckoutValidation() {
 function getSelectedCardData(cardEl) {
   return {
     title: $(".ms-card-title", cardEl)?.textContent?.trim() ?? "Unknown Plan",
-    price: $(".ms-price-badge", cardEl)?.textContent?.trim() ?? "",
-    priceType: $(".ms-price-label", cardEl)?.textContent?.trim() ?? "",
+    price: $(".ms-price-amount", cardEl)?.textContent?.trim() ?? "",
+    priceType: $(".ms-price-type", cardEl)?.textContent?.trim() ?? "",
   };
 }
 
@@ -493,7 +389,7 @@ function openCheckoutModal(cardEl) {
   checkoutSelectedCard.innerHTML = `
     <span class="checkout-selected-label">Selected Plan:</span>
     <span class="checkout-selected-plan">${cardData.title}</span>
-    <span class="checkout-selected-amount">${cardData.price}</span>
+    <span class="checkout-selected-amount">${cardData.price}${cardData.priceType ? ` ${cardData.priceType}` : ""}</span>
   `;
   checkoutOverlay.classList.add("active");
   checkoutOverlay.setAttribute("aria-hidden", "false");
@@ -563,7 +459,7 @@ function isValidCheckoutEmail(value) {
 }
 
 function sanitizePhoneInput(value) {
-  return value.replace(/[^0-9\s-]/g, "");
+  return value.replace(/[^0-9()\s-]/g, "");
 }
 
 function validateCheckoutForm() {
@@ -584,11 +480,6 @@ function validateCheckoutForm() {
     setCheckoutFieldError(checkoutPhone, checkoutPhoneError, "Mobile number is required.");
     isValid = false;
   }
-  // Phone format validation intentionally disabled for now.
-  // else if (itiInstance && !itiInstance.isValidNumber()) {
-  //   setCheckoutFieldError(checkoutPhone, checkoutPhoneError, "Please enter a valid mobile number.");
-  //   isValid = false;
-  // }
 
   if (!emailVal) {
     setCheckoutFieldError(checkoutEmail, checkoutEmailError, "Email is required.");
@@ -606,14 +497,11 @@ function validateCheckoutForm() {
   return isValid;
 }
 
-function getPhoneWithCountryCode() {
-  if (itiInstance) {
-    return itiInstance.getNumber();
-  }
+function getCheckoutPhoneNumber() {
   return checkoutPhone.value.trim();
 }
 
-$$(".ms-learn-btn").forEach((btn) => {
+$$(".ms-apply-btn").forEach((btn) => {
   btn.addEventListener("click", (event) => {
     event.preventDefault();
     const card = event.currentTarget.closest(".ms-card");
@@ -674,7 +562,7 @@ checkoutForm?.addEventListener("submit", async (event) => {
   const checkoutPayload = {
     selectedCard: selectedCardData,
     name: checkoutName.value.trim(),
-    mobileNumber: getPhoneWithCountryCode(),
+    mobileNumber: getCheckoutPhoneNumber(),
     email: checkoutEmail.value.trim(),
     note: checkoutNote.value.trim(),
   };
@@ -696,9 +584,6 @@ checkoutForm?.addEventListener("submit", async (event) => {
     showPaymentSuccessModal(modalExternalMessage);
     checkoutForm.reset();
     resetCheckoutValidation();
-    if (itiInstance) {
-      itiInstance.setCountry("ca");
-    }
   } else {
     setCheckoutLoadingState(false);
     closeCheckoutModal();
@@ -710,6 +595,7 @@ checkoutForm?.addEventListener("submit", async (event) => {
    8. FLOATING QUERY WIDGET
    ============================================================ */
 const floatingQueryBtn = $("#floatingQueryBtn");
+const questionsSendMessageBtn = $("#questionsSendMessageBtn");
 const floatingQueryOverlay = $("#floatingQueryOverlay");
 const floatingQueryClose = $("#floatingQueryClose");
 const floatingQueryContent = $("#floatingQueryContent");
@@ -814,6 +700,7 @@ function validateFloatingQueryForm() {
 }
 
 floatingQueryBtn?.addEventListener("click", openFloatingQueryWidget);
+questionsSendMessageBtn?.addEventListener("click", openFloatingQueryWidget);
 floatingQueryClose?.addEventListener("click", closeFloatingQueryWidget);
 
 floatingQueryOverlay?.addEventListener("click", (event) => {
