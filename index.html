@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>John Doe – Become Aesthetic</title>
-    <meta name="description" content="Personalized fitness coaching by John Doe. Build muscle, lose fat, and become aesthetic with structured 1-on-1 mentorship plans." />
+    <title>Manu – Become Aesthetic</title>
+    <meta name="description" content="Personalized fitness coaching by Manu. Build muscle, lose fat, and become aesthetic with structured 1-on-1 mentorship plans." />
     <meta name="keywords" content="fitness coach, online fitness coaching, mentorship, workout plan, body transformation, aesthetic physique" />
-    <meta name="author" content="John Doe" />
+    <meta name="author" content="Manu" />
     <meta name="robots" content="index, follow, max-image-preview:large" />
     <meta name="theme-color" content="#0d0d0d" />
     <meta name="format-detection" content="telephone=no" />
@@ -18,14 +18,14 @@
 
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="en_US" />
-    <meta property="og:site_name" content="John Doe Fitness" />
-    <meta property="og:title" content="John Doe - Become Aesthetic" />
+    <meta property="og:site_name" content="Manu Fitness" />
+    <meta property="og:title" content="Manu - Become Aesthetic" />
     <meta property="og:description" content="Get in shape with personalized 1-on-1 mentorship, structured plans, and expert fitness guidance." />
     <meta property="og:url" content="https://example.com/" />
     <meta property="og:image" content="https://example.com/banner-image.png" />
 
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="John Doe - Become Aesthetic" />
+    <meta name="twitter:title" content="Manu - Become Aesthetic" />
     <meta name="twitter:description" content="Personalized fitness coaching and 1-on-1 mentorship to help you become aesthetic." />
     <meta name="twitter:image" content="https://example.com/banner-image.png" />
 
@@ -35,7 +35,7 @@
         "@graph": [
           {
             "@type": "Person",
-            "name": "John Doe",
+            "name": "Manu",
             "jobTitle": "Fitness Coach",
             "url": "https://example.com/",
             "sameAs": [
@@ -44,7 +44,7 @@
           },
           {
             "@type": "WebSite",
-            "name": "John Doe Fitness",
+            "name": "Manu Fitness",
             "url": "https://example.com/",
             "description": "Fitness coaching and mentorship to help clients achieve an aesthetic physique."
           },
@@ -53,7 +53,7 @@
             "name": "1-on-1 Fitness Mentorship",
             "provider": {
               "@type": "Person",
-              "name": "John Doe"
+              "name": "Manu"
             },
             "areaServed": "Worldwide",
             "serviceType": "Online Fitness Coaching"
@@ -71,6 +71,18 @@
     />
 
     <link rel="stylesheet" href="css/style.css" />
+
+    <script>
+      // TODO: Replace these placeholders with your live values.
+      // SECURITY NOTE: Keep production tokens on your backend and proxy calls.
+      window.CALENDLY_CONFIG = {
+        token: "eyJraWQiOiIxY2UxZTEzNjE3ZGNmNzY2YjNjZWJjY2Y4ZGM1YmFmYThhNjVlNjg0MDIzZjdjMzJiZTgzNDliMjM4MDEzNWI0IiwidHlwIjoiUEFUIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJodHRwczovL2F1dGguY2FsZW5kbHkuY29tIiwiaWF0IjoxNzc4OTQxNDQ1LCJqdGkiOiJlMWZlNzBkNS0zMDFiLTRiOWItYmFiMS1hOTc5NzcyMDUyNDUiLCJ1c2VyX3V1aWQiOiIwNjE0NTg5ZC01OWY2LTRiZjAtYjE4Mi05ZWZkNWY2ZjBkMjYiLCJzY29wZSI6ImF2YWlsYWJpbGl0eTpyZWFkIGF2YWlsYWJpbGl0eTp3cml0ZSBldmVudF90eXBlczpyZWFkIGV2ZW50X3R5cGVzOndyaXRlIGxvY2F0aW9uczpyZWFkIHJvdXRpbmdfZm9ybXM6cmVhZCBzaGFyZXM6d3JpdGUgc2NoZWR1bGVkX2V2ZW50czpyZWFkIHNjaGVkdWxlZF9ldmVudHM6d3JpdGUgc2NoZWR1bGluZ19saW5rczp3cml0ZSJ9.l6JoJCDNeOrmXfW1QCzhakjxZvj_924UXIrgbeESn8dwLuuKxZa3LKPBs9O54F88Hh2lK1KxMsGewm5SX2JooA",
+        apiBaseUrl: "https://api.calendly.com",
+        availabilityWindowDays: 7,
+        // Single default Calendly event type URI used for all plans.
+        eventTypeUri: "https://api.calendly.com/event_types/37a52748-3b49-491f-8fda-127d06209c77"
+      };
+    </script>
   </head>
 
   <body>
@@ -420,28 +432,105 @@
         </p>
 
         <form id="checkoutForm" class="checkout-form" novalidate>
-          <div class="checkout-field">
-            <label for="checkoutName">Name</label>
-            <input type="text" id="checkoutName" name="name" placeholder="Enter your name" autocomplete="name" />
-            <span class="checkout-error" id="checkoutNameError"></span>
+          <div class="checkout-grid">
+            <div class="checkout-field">
+              <label for="checkoutName">Name</label>
+              <input type="text" id="checkoutName" name="name" placeholder="Enter your name" autocomplete="name" />
+              <span class="checkout-error" id="checkoutNameError"></span>
+            </div>
+
+            <div class="checkout-field">
+              <label for="checkoutPhone">Mobile Number</label>
+              <input type="tel" id="checkoutPhone" name="mobile" placeholder="Enter mobile number" autocomplete="tel" inputmode="tel" pattern="[0-9()\-\s]*" />
+              <span class="checkout-error" id="checkoutPhoneError"></span>
+            </div>
+
+            <div class="checkout-field">
+              <label for="checkoutEmail">Email</label>
+              <input type="email" id="checkoutEmail" name="email" placeholder="Enter your email" autocomplete="email" />
+              <span class="checkout-error" id="checkoutEmailError"></span>
+            </div>
+
+            <div class="checkout-field">
+              <label for="checkoutDateButton">Date</label>
+              <div class="checkout-date-picker" id="checkoutDatePicker">
+                <button type="button" class="checkout-date-button" id="checkoutDateButton" aria-expanded="false" aria-controls="checkoutDatePopover">
+                  Select a date
+                </button>
+                <input type="hidden" id="checkoutDate" name="date" />
+                <div class="checkout-date-popover" id="checkoutDatePopover" hidden>
+                  <div class="checkout-date-popover-header">
+                    <button type="button" class="checkout-date-nav" id="checkoutDatePrev" aria-label="Previous month">&#10094;</button>
+                    <p class="checkout-date-month" id="checkoutDateMonth"></p>
+                    <button type="button" class="checkout-date-nav" id="checkoutDateNext" aria-label="Next month">&#10095;</button>
+                  </div>
+                  <div class="checkout-date-weekdays">
+                    <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+                  </div>
+                  <div class="checkout-date-grid" id="checkoutDateGrid"></div>
+                </div>
+              </div>
+              <span class="checkout-error" id="checkoutDateError"></span>
+            </div>
+
+            <div class="checkout-field">
+              <label for="checkoutTimeButton">Time</label>
+              <div class="checkout-time-picker" id="checkoutTimePicker">
+                <button
+                  type="button"
+                  class="checkout-time-button"
+                  id="checkoutTimeButton"
+                  aria-expanded="false"
+                  aria-controls="checkoutTimePopover"
+                  disabled
+                >
+                  Select a date first
+                </button>
+                <input type="hidden" id="checkoutTime" name="time" />
+                <div class="checkout-time-popover" id="checkoutTimePopover" hidden>
+                  <div class="checkout-time-list" id="checkoutTimeList"></div>
+                </div>
+              </div>
+              <span class="checkout-error" id="checkoutTimeError"></span>
+            </div>
+
+            <div class="checkout-field checkout-field--full">
+              <label for="checkoutNote">Note</label>
+              <textarea id="checkoutNote" name="note" rows="3" placeholder="Anything else you want me to know"></textarea>
+              <span class="checkout-error" id="checkoutNoteError"></span>
+            </div>
           </div>
 
-          <div class="checkout-field">
-            <label for="checkoutPhone">Mobile Number</label>
-            <input type="tel" id="checkoutPhone" name="mobile" placeholder="Enter mobile number" autocomplete="tel" inputmode="tel" pattern="[0-9()\-\s]*" />
-            <span class="checkout-error" id="checkoutPhoneError"></span>
+          <div class="checkout-plan-questions" id="checkoutPlanQuestions"></div>
+
+          <div class="checkout-field checkout-field--full">
+            <label for="checkoutQuestion1" id="checkoutQuestion1Label"></label>
+            <textarea id="checkoutQuestion1" name="question1" rows="3" placeholder="Write your answer"></textarea>
+            <span class="checkout-error" id="checkoutQuestion1Error"></span>
           </div>
 
-          <div class="checkout-field">
-            <label for="checkoutEmail">Email</label>
-            <input type="email" id="checkoutEmail" name="email" placeholder="Enter your email" autocomplete="email" />
-            <span class="checkout-error" id="checkoutEmailError"></span>
+          <div class="checkout-field checkout-field--full">
+            <label for="checkoutQuestion2" id="checkoutQuestion2Label"></label>
+            <textarea id="checkoutQuestion2" name="question2" rows="3" placeholder="Write your answer"></textarea>
+            <span class="checkout-error" id="checkoutQuestion2Error"></span>
           </div>
 
-          <div class="checkout-field">
-            <label for="checkoutNote">Note</label>
-            <textarea id="checkoutNote" name="note" rows="4" placeholder="Write your note"></textarea>
-            <span class="checkout-error" id="checkoutNoteError"></span>
+          <div class="checkout-field checkout-field--full">
+            <label for="checkoutQuestion3" id="checkoutQuestion3Label"></label>
+            <textarea id="checkoutQuestion3" name="question3" rows="3" placeholder="Write your answer"></textarea>
+            <span class="checkout-error" id="checkoutQuestion3Error"></span>
+          </div>
+
+          <div class="checkout-field checkout-field--full">
+            <label for="checkoutQuestion4" id="checkoutQuestion4Label"></label>
+            <textarea id="checkoutQuestion4" name="question4" rows="3" placeholder="Write your answer"></textarea>
+            <span class="checkout-error" id="checkoutQuestion4Error"></span>
+          </div>
+
+          <div class="checkout-field checkout-field--full">
+            <label for="checkoutQuestion5" id="checkoutQuestion5Label"></label>
+            <textarea id="checkoutQuestion5" name="question5" rows="3" placeholder="Write your answer"></textarea>
+            <span class="checkout-error" id="checkoutQuestion5Error"></span>
           </div>
 
           <div class="checkout-actions">
@@ -548,7 +637,7 @@
     <!-- ===== FOOTER ===== -->
     <footer class="footer">
       <div class="footer__inner">
-        <p class="footer__text">Copyright @ Jack H. Woods. All Rights Reserved</p>
+        <p class="footer__text">Copyright @ Manu. All Rights Reserved</p>
       </div>
     </footer>
 

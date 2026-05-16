@@ -1,0 +1,43 @@
+{
+  "plans": [
+    {
+      "id": "consultation_call_99",
+      "matchTitle": "CONSULTATION CALL",
+      "displayTitle": "Consultation Call $99",
+      "pretext": "Take 2 minutes to fill this out before booking. It helps me show up to our call prepared so we can make the most of our time together.",
+      "questions": [
+        "What is your main goal right now?",
+        "What has stopped you from achieving it so far?",
+        "How many days per week can you train?",
+        "Do you have any injuries or limitations?",
+        "What is your current training experience?"
+      ]
+    },
+    {
+      "id": "transformation_12_week_687",
+      "matchTitle": "12-WEEK TRANSFORMATION",
+      "displayTitle": "12-WEEK TRANSFORMATION $687",
+      "pretext": "Fill this out so I understand where you are before we speak. The more honest you are, the more value I can give you on our call.",
+      "questions": [
+        "What is your goal for the 12 weeks?",
+        "How many days per week can you train and for how long?",
+        "Do you have gym access?",
+        "What does your diet look like currently?",
+        "Why now - what has changed that made you take action?"
+      ]
+    },
+    {
+      "id": "monthly_coaching_299",
+      "matchTitle": "MONTHLY COACHING",
+      "displayTitle": "MONTHLY COACHING $299",
+      "pretext": "Before you book, answer a few quick questions so I can understand your situation and come prepared with a clear plan for you.",
+      "questions": [
+        "What does your ideal physique look like?",
+        "What is your training history?",
+        "What has and hasn't worked for you in the past?",
+        "What does your schedule look like week to week?",
+        "Why do you want a coach rather than doing it alone?"
+      ]
+    }
+  ]
+}

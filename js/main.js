@@ -209,7 +209,6 @@ form?.addEventListener("submit", async (e) => {
 
   // await new Promise((resolve) => setTimeout(resolve, 5000));
 
-  
   // Log for debug
   console.log("New subscriber:", subscriber);
 
@@ -244,13 +243,13 @@ form?.addEventListener("submit", async (e) => {
 /* ============================================================
    6. MENTORSHIP CAROUSEL  (mobile swipeable, desktop grid)
    ============================================================ */
-const msTrack    = $("#mentorshipTrack");
-const msPrevBtn  = $("#msPrev");
-const msNextBtn  = $("#msNext");
-const msDotEls   = $$(".ms-dot");
-const msCardEls  = $$(".ms-card", msTrack);
-const msTotal    = msCardEls.length;
-let   msCurrent  = 0;
+const msTrack = $("#mentorshipTrack");
+const msPrevBtn = $("#msPrev");
+const msNextBtn = $("#msNext");
+const msDotEls = $$(".ms-dot");
+const msCardEls = $$(".ms-card", msTrack);
+const msTotal = msCardEls.length;
+let msCurrent = 0;
 
 function isMobileView() {
   return window.innerWidth <= 767;
@@ -281,9 +280,13 @@ msDotEls.forEach((dot, i) => dot.addEventListener("click", () => msGoTo(i)));
 
 // Touch / swipe on the track
 let msTouchStartX = 0;
-msTrack?.addEventListener("touchstart", (e) => {
-  msTouchStartX = e.touches[0].clientX;
-}, { passive: true });
+msTrack?.addEventListener(
+  "touchstart",
+  (e) => {
+    msTouchStartX = e.touches[0].clientX;
+  },
+  { passive: true },
+);
 
 msTrack?.addEventListener("touchend", (e) => {
   if (!isMobileView()) return;
@@ -320,16 +323,55 @@ const checkoutClose = $("#checkoutClose");
 const checkoutForm = $("#checkoutForm");
 const checkoutSubmitBtn = $("#checkoutSubmitBtn");
 const checkoutSelectedCard = $("#checkoutSelectedCard");
+const checkoutPlanQuestions = $("#checkoutPlanQuestions");
 
 const checkoutName = $("#checkoutName");
 const checkoutPhone = $("#checkoutPhone");
 const checkoutEmail = $("#checkoutEmail");
 const checkoutNote = $("#checkoutNote");
+const checkoutDatePicker = $("#checkoutDatePicker");
+const checkoutDateButton = $("#checkoutDateButton");
+const checkoutDateInput = $("#checkoutDate");
+const checkoutDatePopover = $("#checkoutDatePopover");
+const checkoutDatePrev = $("#checkoutDatePrev");
+const checkoutDateNext = $("#checkoutDateNext");
+const checkoutDateMonth = $("#checkoutDateMonth");
+const checkoutDateGrid = $("#checkoutDateGrid");
+const checkoutTimePicker = $("#checkoutTimePicker");
+const checkoutTimeButton = $("#checkoutTimeButton");
+const checkoutTimeInput = $("#checkoutTime");
+const checkoutTimePopover = $("#checkoutTimePopover");
+const checkoutTimeList = $("#checkoutTimeList");
+
+const checkoutQuestionLabels = [
+  $("#checkoutQuestion1Label"),
+  $("#checkoutQuestion2Label"),
+  $("#checkoutQuestion3Label"),
+  $("#checkoutQuestion4Label"),
+  $("#checkoutQuestion5Label"),
+];
+
+const checkoutQuestionInputs = [
+  $("#checkoutQuestion1"),
+  $("#checkoutQuestion2"),
+  $("#checkoutQuestion3"),
+  $("#checkoutQuestion4"),
+  $("#checkoutQuestion5"),
+];
 
 const checkoutNameError = $("#checkoutNameError");
 const checkoutPhoneError = $("#checkoutPhoneError");
 const checkoutEmailError = $("#checkoutEmailError");
 const checkoutNoteError = $("#checkoutNoteError");
+const checkoutDateError = $("#checkoutDateError");
+const checkoutTimeError = $("#checkoutTimeError");
+const checkoutQuestionErrors = [
+  $("#checkoutQuestion1Error"),
+  $("#checkoutQuestion2Error"),
+  $("#checkoutQuestion3Error"),
+  $("#checkoutQuestion4Error"),
+  $("#checkoutQuestion5Error"),
+];
 
 const paymentOverlay = $("#paymentOverlay");
 const paymentModal = $(".payment-modal");
@@ -341,6 +383,68 @@ const paymentExternalMessage = $("#paymentExternalMessage");
 
 let selectedMentorshipCard = null;
 let isCheckoutLoading = false;
+let selectedCheckoutPlan = null;
+let checkoutPlansConfig = null;
+let currentCalendarMonth = new Date(
+  new Date().getFullYear(),
+  new Date().getMonth(),
+  1,
+);
+let selectedAvailabilityDate = "";
+const availableSlotsByDate = new Map();
+const availableDateKeys = new Set();
+const availabilityCacheByPlanId = new Map();
+const availabilityFetchPromisesByPlanId = new Map();
+const availabilityWindowResponseCache = new Map();
+const availabilityWindowInFlightByKey = new Map();
+let hasStartedAvailabilityPreload = false;
+
+const defaultCheckoutPlanConfig = {
+  plans: [
+    {
+      id: "consultation_call_99",
+      matchTitle: "CONSULTATION CALL",
+      displayTitle: "Consultation Call $99",
+      pretext:
+        "Take 2 minutes to fill this out before booking. It helps me show up to our call prepared so we can make the most of our time together.",
+      questions: [
+        "What is your main goal right now?",
+        "What has stopped you from achieving it so far?",
+        "How many days per week can you train?",
+        "Do you have any injuries or limitations?",
+        "What is your current training experience?",
+      ],
+    },
+    {
+      id: "transformation_12_week_687",
+      matchTitle: "12-WEEK TRANSFORMATION",
+      displayTitle: "12-WEEK TRANSFORMATION $687",
+      pretext:
+        "Fill this out so I understand where you are before we speak. The more honest you are, the more value I can give you on our call.",
+      questions: [
+        "What is your goal for the 12 weeks?",
+        "How many days per week can you train and for how long?",
+        "Do you have gym access?",
+        "What does your diet look like currently?",
+        "Why now - what has changed that made you take action?",
+      ],
+    },
+    {
+      id: "monthly_coaching_299",
+      matchTitle: "MONTHLY COACHING",
+      displayTitle: "MONTHLY COACHING $299",
+      pretext:
+        "Before you book, answer a few quick questions so I can understand your situation and come prepared with a clear plan for you.",
+      questions: [
+        "What does your ideal physique look like?",
+        "What is your training history?",
+        "What has and hasn't worked for you in the past?",
+        "What does your schedule look like week to week?",
+        "Why do you want a coach rather than doing it alone?",
+      ],
+    },
+  ],
+};
 
 function setCheckoutLoadingState(isLoading) {
   isCheckoutLoading = isLoading;
@@ -373,31 +477,621 @@ function resetCheckoutValidation() {
   clearCheckoutFieldError(checkoutPhone, checkoutPhoneError);
   clearCheckoutFieldError(checkoutEmail, checkoutEmailError);
   clearCheckoutFieldError(checkoutNote, checkoutNoteError);
+  clearCheckoutFieldError(checkoutDateButton, checkoutDateError);
+  clearCheckoutFieldError(checkoutTimeButton, checkoutTimeError);
+  checkoutQuestionInputs.forEach((input, index) => {
+    clearCheckoutFieldError(input, checkoutQuestionErrors[index]);
+  });
 }
 
 function getSelectedCardData(cardEl) {
+  const title =
+    $(".ms-card-title", cardEl)?.textContent?.trim() ?? "Unknown Plan";
+  const matchedPlan = getPlanByCardTitle(title);
+
   return {
-    title: $(".ms-card-title", cardEl)?.textContent?.trim() ?? "Unknown Plan",
+    title,
     price: $(".ms-price-amount", cardEl)?.textContent?.trim() ?? "",
     priceType: $(".ms-price-type", cardEl)?.textContent?.trim() ?? "",
+    planId: matchedPlan?.id ?? "",
   };
 }
 
-function openCheckoutModal(cardEl) {
+function getCalendlyConfig() {
+  const cfg = window.CALENDLY_CONFIG ?? {};
+
+  return {
+    token: cfg.token ?? "",
+    apiBaseUrl: cfg.apiBaseUrl ?? "https://api.calendly.com",
+    availabilityWindowDays: Number(cfg.availabilityWindowDays ?? 7),
+    eventTypeUri: cfg.eventTypeUri ?? "",
+  };
+}
+
+function getCalendlyEventTypeUri(planId) {
+  void planId;
+  const cfg = getCalendlyConfig();
+  return cfg.eventTypeUri ?? "";
+}
+
+function getCalendlyAuthHeaders() {
+  const cfg = getCalendlyConfig();
+
+  if (!cfg.token) {
+    throw new Error(
+      "Calendly token is missing in window.CALENDLY_CONFIG.token.",
+    );
+  }
+
+  return {
+    Authorization: `Bearer ${cfg.token}`,
+    "Content-Type": "application/json",
+    Accept: "application/json",
+  };
+}
+
+async function ensureCheckoutPlansLoaded() {
+  if (checkoutPlansConfig?.plans?.length) {
+    return checkoutPlansConfig;
+  }
+
+  try {
+    const response = await fetch("assets/checkout-plans.json", {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        `Plan config request failed with status ${response.status}.`,
+      );
+    }
+
+    const parsedConfig = await response.json();
+    if (
+      !Array.isArray(parsedConfig?.plans) ||
+      parsedConfig.plans.length === 0
+    ) {
+      throw new Error("Plan config file does not include valid plans.");
+    }
+
+    checkoutPlansConfig = parsedConfig;
+  } catch (error) {
+    console.error(
+      "Failed to load assets/checkout-plans.json. Falling back to defaults.",
+      error,
+    );
+    checkoutPlansConfig = defaultCheckoutPlanConfig;
+  }
+
+  return checkoutPlansConfig;
+}
+
+function getPlanByCardTitle(cardTitle) {
+  const normalizedTitle = (cardTitle ?? "").trim().toUpperCase();
+  const plans = checkoutPlansConfig?.plans ?? [];
+  return (
+    plans.find(
+      (plan) =>
+        (plan.matchTitle ?? "").trim().toUpperCase() === normalizedTitle,
+    ) ?? null
+  );
+}
+
+function renderSelectedPlanQuestions(plan) {
+  selectedCheckoutPlan = plan;
+
+  checkoutPlanQuestions.textContent = "";
+
+  if (!plan?.questions?.length) {
+    checkoutQuestionLabels.forEach((labelEl, index) => {
+      labelEl.textContent = `Question ${index + 1}`;
+    });
+    return;
+  }
+
+  const hint = document.createElement("p");
+  hint.className = "checkout-plan-questions-hint";
+  hint.textContent = plan?.pretext ?? "";
+  checkoutPlanQuestions.appendChild(hint);
+
+  checkoutQuestionLabels.forEach((labelEl, index) => {
+    const questionText = plan.questions[index] ?? `Question ${index + 1}`;
+    labelEl.textContent = questionText;
+  });
+}
+
+function normalizeToDateKey(dateObj) {
+  const year = dateObj.getFullYear();
+  const month = `${dateObj.getMonth() + 1}`.padStart(2, "0");
+  const day = `${dateObj.getDate()}`.padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function getDateKeyFromIso(isoDateTime) {
+  const parsed = new Date(isoDateTime);
+  return normalizeToDateKey(parsed);
+}
+
+function getLocalDateLabel(dateKey) {
+  const [year, month, day] = dateKey.split("-").map(Number);
+  const dateObj = new Date(year, month - 1, day);
+  return dateObj.toLocaleDateString(undefined, {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+}
+
+function getLocalTimeLabel(isoDateTime) {
+  const parsedDate = new Date(isoDateTime);
+  if (Number.isNaN(parsedDate.getTime())) {
+    return "Invalid time";
+  }
+
+  return new Intl.DateTimeFormat(undefined, {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  }).format(parsedDate);
+}
+
+function getAvailabilityCollection(payload) {
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+
+  if (Array.isArray(payload?.collection)) {
+    return payload.collection;
+  }
+
+  if (Array.isArray(payload?.data)) {
+    return payload.data;
+  }
+
+  return [];
+}
+
+function getTodayStartDate() {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return today;
+}
+
+function cloneAvailabilitySnapshot(snapshot) {
+  const clonedSlotsByDate = new Map();
+  snapshot.slotsByDate.forEach((slots, dateKey) => {
+    clonedSlotsByDate.set(dateKey, [...slots]);
+  });
+
+  return {
+    slotsByDate: clonedSlotsByDate,
+    dateKeys: new Set(snapshot.dateKeys),
+  };
+}
+
+function applyAvailabilitySnapshot(snapshot) {
+  availableSlotsByDate.clear();
+  availableDateKeys.clear();
+
+  snapshot.slotsByDate.forEach((slots, dateKey) => {
+    availableSlotsByDate.set(dateKey, [...slots]);
+    availableDateKeys.add(dateKey);
+  });
+}
+
+function resetSchedulingSelection() {
+  selectedAvailabilityDate = "";
+  checkoutDateInput.value = "";
+  checkoutDateButton.textContent = "Select a date";
+  checkoutDateButton.classList.remove("is-selected");
+
+  checkoutTimeInput.value = "";
+  checkoutTimeButton.textContent = "Select a date first";
+  checkoutTimeButton.classList.remove("is-selected");
+  checkoutTimeButton.disabled = true;
+  checkoutTimeList.innerHTML = "";
+  setTimePickerOpen(false);
+
+  clearCheckoutFieldError(checkoutDateButton, checkoutDateError);
+  clearCheckoutFieldError(checkoutTimeButton, checkoutTimeError);
+}
+
+function setDatePickerOpen(isOpen) {
+  checkoutDatePopover.hidden = !isOpen;
+  checkoutDateButton.setAttribute("aria-expanded", String(isOpen));
+}
+
+function setTimePickerOpen(isOpen) {
+  checkoutTimePopover.hidden = !isOpen;
+  checkoutTimeButton.setAttribute("aria-expanded", String(isOpen));
+}
+
+function renderTimeOptionsForDate(dateKey) {
+  const slots = availableSlotsByDate.get(dateKey) ?? [];
+  checkoutTimeInput.value = "";
+  checkoutTimeButton.classList.remove("is-selected");
+  checkoutTimeList.innerHTML = "";
+
+  if (!slots.length) {
+    checkoutTimeButton.textContent = "No available times for this date";
+    checkoutTimeButton.disabled = true;
+    setTimePickerOpen(false);
+    return;
+  }
+
+  checkoutTimeButton.textContent = "Select a time";
+  checkoutTimeButton.disabled = false;
+
+  slots.forEach((slotIso) => {
+    const slotButton = document.createElement("button");
+    slotButton.type = "button";
+    slotButton.className = "checkout-time-option";
+    slotButton.textContent = getLocalTimeLabel(slotIso);
+
+    slotButton.addEventListener("click", () => {
+      checkoutTimeInput.value = slotIso;
+      checkoutTimeButton.textContent = getLocalTimeLabel(slotIso);
+      checkoutTimeButton.classList.add("is-selected");
+      clearCheckoutFieldError(checkoutTimeButton, checkoutTimeError);
+      setTimePickerOpen(false);
+    });
+
+    checkoutTimeList.appendChild(slotButton);
+  });
+}
+
+function selectAvailabilityDate(dateKey) {
+  selectedAvailabilityDate = dateKey;
+  checkoutDateInput.value = dateKey;
+  checkoutDateButton.classList.add("is-selected");
+  checkoutDateButton.textContent = getLocalDateLabel(dateKey);
+
+  $$(".checkout-date-cell", checkoutDateGrid).forEach((cellButton) => {
+    if (cellButton.classList.contains("checkout-date-cell--empty")) {
+      return;
+    }
+    const isSelected = cellButton.dataset.dateKey === dateKey;
+    cellButton.classList.toggle("is-selected", isSelected);
+  });
+
+  renderTimeOptionsForDate(dateKey);
+  setDatePickerOpen(false);
+  clearCheckoutFieldError(checkoutDateButton, checkoutDateError);
+}
+
+function renderCalendarGrid() {
+  checkoutDateGrid.innerHTML = "";
+
+  const year = currentCalendarMonth.getFullYear();
+  const month = currentCalendarMonth.getMonth();
+  const firstOfMonth = new Date(year, month, 1);
+  const firstDayOffset = firstOfMonth.getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const todayStart = getTodayStartDate();
+  const todayKey = normalizeToDateKey(todayStart);
+
+  checkoutDateMonth.textContent = currentCalendarMonth.toLocaleDateString(
+    undefined,
+    {
+      month: "long",
+      year: "numeric",
+    },
+  );
+
+  for (let empty = 0; empty < firstDayOffset; empty += 1) {
+    const blank = document.createElement("span");
+    blank.className = "checkout-date-cell checkout-date-cell--empty";
+    checkoutDateGrid.appendChild(blank);
+  }
+
+  for (let day = 1; day <= daysInMonth; day += 1) {
+    const dateObj = new Date(year, month, day);
+    const dateKey = normalizeToDateKey(dateObj);
+    const hasSlots = availableDateKeys.has(dateKey);
+    const isPastDate = dateObj < todayStart;
+    const isDisabled = isPastDate || !hasSlots;
+
+    const dayButton = document.createElement("button");
+    dayButton.type = "button";
+    dayButton.className = "checkout-date-cell";
+    dayButton.textContent = String(day);
+    dayButton.disabled = isDisabled;
+    dayButton.dataset.dateKey = dateKey;
+
+    if (dateKey === selectedAvailabilityDate) {
+      dayButton.classList.add("is-selected");
+    }
+
+    if (dateKey === todayKey) {
+      dayButton.classList.add("is-today");
+    }
+
+    if (isDisabled) {
+      dayButton.classList.add("is-disabled");
+    }
+
+    dayButton.addEventListener("click", () => selectAvailabilityDate(dateKey));
+    checkoutDateGrid.appendChild(dayButton);
+  }
+}
+
+async function fetchCalendlyAvailability(planId) {
+  const eventTypeUri = getCalendlyEventTypeUri(planId);
+  if (!eventTypeUri) {
+    throw new Error(`Calendly event type URI missing for plan id: ${planId}.`);
+  }
+
+  const cfg = getCalendlyConfig();
+
+  // Calendly API constraint: range must be <= 7 days and start_time must be future.
+  // To load a larger horizon (2 months), we fetch multiple 7-day windows and merge results.
+  const MAX_CALENDLY_RANGE_DAYS = 7;
+  const TARGET_LOOKAHEAD_DAYS = 60;
+  const FUTURE_START_BUFFER_MINUTES = 5;
+  const requestedWindowDays = Number.isFinite(cfg.availabilityWindowDays)
+    ? cfg.availabilityWindowDays
+    : TARGET_LOOKAHEAD_DAYS;
+  const safeTotalWindowDays = Math.max(
+    TARGET_LOOKAHEAD_DAYS,
+    Math.max(1, Math.floor(requestedWindowDays)),
+  );
+
+  const start = new Date();
+  start.setMinutes(start.getMinutes() + FUTURE_START_BUFFER_MINUTES, 0, 0);
+
+  const fullRangeEnd = new Date(start);
+  fullRangeEnd.setDate(fullRangeEnd.getDate() + safeTotalWindowDays);
+
+  const mergedCollection = [];
+  let windowStart = new Date(start);
+
+  while (windowStart < fullRangeEnd) {
+    const windowEnd = new Date(windowStart);
+    windowEnd.setDate(windowEnd.getDate() + MAX_CALENDLY_RANGE_DAYS);
+    if (windowEnd > fullRangeEnd) {
+      windowEnd.setTime(fullRangeEnd.getTime());
+    }
+
+    const windowStartIso = windowStart.toISOString();
+    const windowEndIso = windowEnd.toISOString();
+    const windowRequestKey = `${eventTypeUri}|${windowStartIso}|${windowEndIso}`;
+
+    const cachedWindowCollection =
+      availabilityWindowResponseCache.get(windowRequestKey);
+    if (cachedWindowCollection) {
+      mergedCollection.push(...cachedWindowCollection);
+    } else {
+      let inFlightPromise =
+        availabilityWindowInFlightByKey.get(windowRequestKey);
+
+      if (!inFlightPromise) {
+        const params = new URLSearchParams({
+          event_type: eventTypeUri,
+          start_time: windowStartIso,
+          end_time: windowEndIso,
+        });
+
+        inFlightPromise = fetch(
+          `${cfg.apiBaseUrl}/event_type_available_times?${params.toString()}`,
+          {
+            method: "GET",
+            headers: getCalendlyAuthHeaders(),
+          },
+        )
+          .then(async (response) => {
+            if (!response.ok) {
+              const failureText = await response.text();
+              throw new Error(
+                `Calendly availability request failed (${response.status}) for ${windowStartIso} to ${windowEndIso}: ${failureText}`,
+              );
+            }
+
+            const data = await response.json();
+            const normalizedCollection = getAvailabilityCollection(data);
+            availabilityWindowResponseCache.set(
+              windowRequestKey,
+              normalizedCollection,
+            );
+            return normalizedCollection;
+          })
+          .finally(() => {
+            availabilityWindowInFlightByKey.delete(windowRequestKey);
+          });
+
+        availabilityWindowInFlightByKey.set(windowRequestKey, inFlightPromise);
+      }
+
+      const windowCollection = await inFlightPromise;
+      mergedCollection.push(...windowCollection);
+    }
+
+    windowStart = new Date(windowEnd);
+    windowStart.setSeconds(windowStart.getSeconds() + 1);
+  }
+
+  const slotsByDate = new Map();
+  const dateKeys = new Set();
+
+  mergedCollection.forEach((slotItem) => {
+    const slotIso = slotItem?.start_time ?? slotItem?.startTime ?? "";
+    const slotStatus = slotItem?.status ?? "available";
+    const parsedSlotDate = new Date(slotIso);
+
+    if (
+      !slotIso ||
+      Number.isNaN(parsedSlotDate.getTime()) ||
+      slotStatus !== "available"
+    ) {
+      return;
+    }
+
+    const dateKey = getDateKeyFromIso(slotIso);
+    const list = slotsByDate.get(dateKey) ?? [];
+    list.push(slotIso);
+    slotsByDate.set(dateKey, list);
+    dateKeys.add(dateKey);
+  });
+
+  slotsByDate.forEach((slots, dateKey) => {
+    const dedupedAndSortedSlots = [...new Set(slots)].sort(
+      (a, b) => new Date(a) - new Date(b),
+    );
+    slotsByDate.set(dateKey, dedupedAndSortedSlots);
+  });
+
+  return {
+    slotsByDate,
+    dateKeys,
+  };
+}
+
+function primeAvailabilityForPlan(planId) {
+  if (!planId) {
+    return Promise.resolve(null);
+  }
+
+  const cachedSnapshot = availabilityCacheByPlanId.get(planId);
+  if (cachedSnapshot) {
+    return Promise.resolve(cachedSnapshot);
+  }
+
+  const activePromise = availabilityFetchPromisesByPlanId.get(planId);
+  if (activePromise) {
+    return activePromise;
+  }
+
+  const fetchPromise = fetchCalendlyAvailability(planId)
+    .then((snapshot) => {
+      availabilityCacheByPlanId.set(
+        planId,
+        cloneAvailabilitySnapshot(snapshot),
+      );
+      return snapshot;
+    })
+    .finally(() => {
+      availabilityFetchPromisesByPlanId.delete(planId);
+    });
+
+  availabilityFetchPromisesByPlanId.set(planId, fetchPromise);
+  return fetchPromise;
+}
+
+function preloadCalendlyAvailability() {
+  if (hasStartedAvailabilityPreload) {
+    return;
+  }
+
+  hasStartedAvailabilityPreload = true;
+
+  void ensureCheckoutPlansLoaded()
+    .then((planConfig) => {
+      const planIds = (planConfig?.plans ?? [])
+        .map((plan) => plan?.id)
+        .filter(
+          (planId) => typeof planId === "string" && planId.trim().length > 0,
+        );
+
+      if (!planIds.length) {
+        return;
+      }
+
+      planIds.forEach((planId) => {
+        void primeAvailabilityForPlan(planId).catch((error) => {
+          console.error(
+            `Failed to preload Calendly availability for plan ${planId}:`,
+            error,
+          );
+        });
+      });
+    })
+    .catch((error) => {
+      console.error("Failed to preload Calendly availability.", error);
+    });
+}
+
+async function loadPlanAvailability(planId) {
+  resetSchedulingSelection();
+  checkoutDateButton.textContent = "Loading available dates...";
+  checkoutDateButton.disabled = true;
+
+  try {
+    const snapshot = await primeAvailabilityForPlan(planId);
+    if (snapshot) {
+      applyAvailabilitySnapshot(snapshot);
+    }
+
+    checkoutDateButton.disabled = false;
+
+    if (!availableDateKeys.size) {
+      checkoutDateButton.textContent = "No available dates";
+      checkoutDateButton.disabled = true;
+      setCheckoutFieldError(
+        checkoutDateButton,
+        checkoutDateError,
+        "No available dates for this plan right now. Please try another plan or come back later.",
+      );
+    } else {
+      checkoutDateButton.textContent = "Select a date";
+      clearCheckoutFieldError(checkoutDateButton, checkoutDateError);
+    }
+  } catch (error) {
+    console.error("Failed to fetch Calendly availability:", error);
+    checkoutDateButton.textContent = "Availability unavailable";
+    checkoutDateButton.disabled = true;
+    setCheckoutFieldError(
+      checkoutDateButton,
+      checkoutDateError,
+      "Could not load date availability. Please check Calendly configuration.",
+    );
+  }
+
+  renderCalendarGrid();
+}
+
+async function openCheckoutModal(cardEl) {
   selectedMentorshipCard = cardEl;
+  await ensureCheckoutPlansLoaded();
+
   const cardData = getSelectedCardData(cardEl);
+
   checkoutSelectedCard.innerHTML = `
     <span class="checkout-selected-label">Selected Plan:</span>
     <span class="checkout-selected-plan">${cardData.title}</span>
     <span class="checkout-selected-amount">${cardData.price}${cardData.priceType ? ` ${cardData.priceType}` : ""}</span>
   `;
+
+  const selectedPlan =
+    getPlanByCardTitle(cardData.title) ?? checkoutPlansConfig.plans[0] ?? null;
+  renderSelectedPlanQuestions(selectedPlan);
+
+  checkoutForm.reset();
+  resetCheckoutValidation();
+  currentCalendarMonth = new Date(
+    new Date().getFullYear(),
+    new Date().getMonth(),
+    1,
+  );
+  renderCalendarGrid();
+
   checkoutOverlay.classList.add("active");
   checkoutOverlay.setAttribute("aria-hidden", "false");
+
+  if (selectedPlan?.id) {
+    void loadPlanAvailability(selectedPlan.id);
+  }
 }
+
+preloadCalendlyAvailability();
 
 function closeCheckoutModal() {
   checkoutOverlay.classList.remove("active");
   checkoutOverlay.setAttribute("aria-hidden", "true");
+  setDatePickerOpen(false);
 }
 
 function showPaymentStatus(isSuccess) {
@@ -406,7 +1100,8 @@ function showPaymentStatus(isSuccess) {
   if (isSuccess) {
     paymentStatusIcon.textContent = "🎉";
     paymentStatusTitle.textContent = "Payment Successful";
-    paymentStatusMessage.textContent = "Payment successful. We will contact you soon.";
+    paymentStatusMessage.textContent =
+      "Payment successful. We will contact you soon.";
   } else {
     paymentStatusIcon.textContent = "⚠️";
     paymentStatusTitle.textContent = "Payment Failed";
@@ -467,6 +1162,8 @@ function validateCheckoutForm() {
   const phoneVal = checkoutPhone.value.trim();
   const emailVal = checkoutEmail.value.trim();
   const noteVal = checkoutNote.value.trim();
+  const selectedDate = checkoutDateInput.value.trim();
+  const selectedTime = checkoutTimeInput.value.trim();
   let isValid = true;
 
   resetCheckoutValidation();
@@ -477,17 +1174,58 @@ function validateCheckoutForm() {
   }
 
   if (!phoneVal) {
-    setCheckoutFieldError(checkoutPhone, checkoutPhoneError, "Mobile number is required.");
+    setCheckoutFieldError(
+      checkoutPhone,
+      checkoutPhoneError,
+      "Mobile number is required.",
+    );
     isValid = false;
   }
 
   if (!emailVal) {
-    setCheckoutFieldError(checkoutEmail, checkoutEmailError, "Email is required.");
+    setCheckoutFieldError(
+      checkoutEmail,
+      checkoutEmailError,
+      "Email is required.",
+    );
     isValid = false;
   } else if (!isValidCheckoutEmail(emailVal)) {
-    setCheckoutFieldError(checkoutEmail, checkoutEmailError, "Please enter a valid email.");
+    setCheckoutFieldError(
+      checkoutEmail,
+      checkoutEmailError,
+      "Please enter a valid email.",
+    );
     isValid = false;
   }
+
+  if (!selectedDate) {
+    setCheckoutFieldError(
+      checkoutDateButton,
+      checkoutDateError,
+      "Date is required.",
+    );
+    isValid = false;
+  }
+
+  if (!selectedTime) {
+    setCheckoutFieldError(
+      checkoutTimeButton,
+      checkoutTimeError,
+      "Time is required.",
+    );
+    isValid = false;
+  }
+
+  checkoutQuestionInputs.forEach((input, index) => {
+    if (!input.value.trim()) {
+      setCheckoutFieldError(
+        input,
+        checkoutQuestionErrors[index],
+        "This answer is required.",
+      );
+      isValid = false;
+    }
+  });
 
   /* if (!noteVal) {
     setCheckoutFieldError(checkoutNote, checkoutNoteError, "Note is required.");
@@ -500,6 +1238,92 @@ function validateCheckoutForm() {
 function getCheckoutPhoneNumber() {
   return checkoutPhone.value.trim();
 }
+
+async function submitCalendlyInvitee(bookingPayload) {
+  // TODO: For production, call your backend endpoint and keep Calendly token server-side.
+  const cfg = getCalendlyConfig();
+  const eventTypeUri = getCalendlyEventTypeUri(
+    bookingPayload.selectedCard.planId,
+  );
+
+  if (!eventTypeUri) {
+    throw new Error("Missing Calendly event type URI for selected plan.");
+  }
+
+  const calendlyBody = {
+    event_type: eventTypeUri,
+    start_time: bookingPayload.startTime,
+    invitee: {
+      name: bookingPayload.name,
+      email: bookingPayload.email,
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    },
+  };
+
+  const response = await fetch(`${cfg.apiBaseUrl}/invitees`, {
+    method: "POST",
+    headers: getCalendlyAuthHeaders(),
+    body: JSON.stringify(calendlyBody),
+  });
+
+  if (!response.ok) {
+    const failureText = await response.text();
+    throw new Error(
+      `Calendly booking failed (${response.status}): ${failureText}`,
+    );
+  }
+
+  return response.json();
+}
+
+checkoutDateButton?.addEventListener("click", () => {
+  if (checkoutDateButton.disabled) {
+    return;
+  }
+
+  renderCalendarGrid();
+
+  const shouldOpen = checkoutDatePopover.hidden;
+  setDatePickerOpen(shouldOpen);
+  setTimePickerOpen(false);
+});
+
+checkoutDatePrev?.addEventListener("click", () => {
+  currentCalendarMonth = new Date(
+    currentCalendarMonth.getFullYear(),
+    currentCalendarMonth.getMonth() - 1,
+    1,
+  );
+  renderCalendarGrid();
+});
+
+checkoutDateNext?.addEventListener("click", () => {
+  currentCalendarMonth = new Date(
+    currentCalendarMonth.getFullYear(),
+    currentCalendarMonth.getMonth() + 1,
+    1,
+  );
+  renderCalendarGrid();
+});
+
+checkoutTimeButton?.addEventListener("click", () => {
+  if (checkoutTimeButton.disabled) {
+    return;
+  }
+  const shouldOpen = checkoutTimePopover.hidden;
+  setTimePickerOpen(shouldOpen);
+  setDatePickerOpen(false);
+});
+
+document.addEventListener("click", (event) => {
+  if (!checkoutDatePicker?.contains(event.target)) {
+    setDatePickerOpen(false);
+  }
+
+  if (!checkoutTimePicker?.contains(event.target)) {
+    setTimePickerOpen(false);
+  }
+});
 
 $$(".ms-apply-btn").forEach((btn) => {
   btn.addEventListener("click", (event) => {
@@ -541,6 +1365,15 @@ checkoutEmail?.addEventListener("input", () =>
 checkoutNote?.addEventListener("input", () =>
   clearCheckoutFieldError(checkoutNote, checkoutNoteError),
 );
+checkoutTimeButton?.addEventListener("focus", () =>
+  clearCheckoutFieldError(checkoutTimeButton, checkoutTimeError),
+);
+
+checkoutQuestionInputs.forEach((input, index) => {
+  input?.addEventListener("input", () => {
+    clearCheckoutFieldError(input, checkoutQuestionErrors[index]);
+  });
+});
 
 checkoutForm?.addEventListener("submit", async (event) => {
   event.preventDefault();
@@ -559,35 +1392,51 @@ checkoutForm?.addEventListener("submit", async (event) => {
     ? getSelectedCardData(selectedMentorshipCard)
     : { title: "Unknown Plan", price: "", priceType: "" };
 
+  const planQuestions = checkoutQuestionInputs.map((input, index) => ({
+    question:
+      checkoutQuestionLabels[index]?.textContent?.trim() ??
+      `Question ${index + 1}`,
+    answer: input.value.trim(),
+  }));
+
   const checkoutPayload = {
     selectedCard: selectedCardData,
     name: checkoutName.value.trim(),
     mobileNumber: getCheckoutPhoneNumber(),
     email: checkoutEmail.value.trim(),
+    selectedDate: checkoutDateInput.value.trim(),
+    startTime: checkoutTimeInput.value.trim(),
     note: checkoutNote.value.trim(),
+    planQuestions,
   };
 
+  console.log("Mentorship checkout selected plan:", selectedCheckoutPlan);
   console.log("Mentorship checkout submit:", checkoutPayload);
+  console.log("Checkout answers:", planQuestions);
 
-  // TODO: PAYMENT SUBMIT
-  // await new Promise((resolve) => setTimeout(resolve, 5000));
+  try {
+    const calendlyResponse = await submitCalendlyInvitee(checkoutPayload);
+    const eventUri = calendlyResponse?.resource?.event ?? "";
+    const inviteeUri = calendlyResponse?.resource?.uri ?? "";
+    const modalExternalMessage = [
+      eventUri ? `Event: ${eventUri}` : "",
+      inviteeUri ? `Invitee: ${inviteeUri}` : "",
+    ]
+      .filter(Boolean)
+      .join(" | ");
 
-  // TODO: Integrate your real payment gateway result here.
-  // Replace this with gateway callback response.
-  const paymentSuccess = true;
-
-  const modalExternalMessage = ""; //TODO: Add any content like transaction ID or anything else.
-
-  if (paymentSuccess) {
     setCheckoutLoadingState(false);
     closeCheckoutModal();
     showPaymentSuccessModal(modalExternalMessage);
     checkoutForm.reset();
+    resetSchedulingSelection();
     resetCheckoutValidation();
-  } else {
+  } catch (error) {
+    console.error("Calendly booking error:", error);
     setCheckoutLoadingState(false);
-    closeCheckoutModal();
-    showPaymentFailedModal(modalExternalMessage);
+    showPaymentFailedModal(
+      error instanceof Error ? error.message : "Calendly booking failed.",
+    );
   }
 });
 
@@ -687,12 +1536,20 @@ function validateFloatingQueryForm() {
     setQueryFieldError(queryEmail, queryEmailError, "Email is required.");
     isValid = false;
   } else if (!isValidCheckoutEmail(emailVal)) {
-    setQueryFieldError(queryEmail, queryEmailError, "Please enter a valid email.");
+    setQueryFieldError(
+      queryEmail,
+      queryEmailError,
+      "Please enter a valid email.",
+    );
     isValid = false;
   }
 
   if (!questionVal) {
-    setQueryFieldError(queryMessage, queryMessageError, "Question is required.");
+    setQueryFieldError(
+      queryMessage,
+      queryMessageError,
+      "Question is required.",
+    );
     isValid = false;
   }
 
