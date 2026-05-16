@@ -97,6 +97,7 @@ const heroSubmitBtn = $("#heroSubmitBtn");
 
 let isHeroSubscribeLoading = false;
 
+/* ---- Hero Subscribe: State + UI helpers ---- */
 function setHeroSubscribeLoadingState(isLoading) {
   isHeroSubscribeLoading = isLoading;
 
@@ -109,22 +110,7 @@ function setHeroSubscribeLoadingState(isLoading) {
   heroSubmitBtn.setAttribute("aria-busy", String(isLoading));
 }
 
-// Live: clear error as user types
-firstNameInput?.addEventListener("input", () =>
-  clearError(firstNameInput, firstNameError),
-);
-emailInput?.addEventListener("input", () => clearError(emailInput, emailError));
-firstNameInput?.addEventListener("input", () => {
-  if (heroSubmitError) {
-    heroSubmitError.textContent = "";
-  }
-});
-emailInput?.addEventListener("input", () => {
-  if (heroSubmitError) {
-    heroSubmitError.textContent = "";
-  }
-});
-
+/* ---- Hero Subscribe: Validation helpers ---- */
 function clearError(input, errorEl) {
   input.classList.remove("error-field");
   errorEl.textContent = "";
@@ -146,6 +132,28 @@ function isValidEmail(val) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val.trim());
 }
 
+function clearHeroSubmitError() {
+  if (heroSubmitError) {
+    heroSubmitError.textContent = "";
+  }
+}
+
+/* ---- Hero Subscribe: Event bindings ---- */
+function bindHeroSubscribeEvents() {
+  // Live: clear field and submit errors while typing.
+  firstNameInput?.addEventListener("input", () => {
+    clearError(firstNameInput, firstNameError);
+    clearHeroSubmitError();
+  });
+
+  emailInput?.addEventListener("input", () => {
+    clearError(emailInput, emailError);
+    clearHeroSubmitError();
+  });
+}
+
+bindHeroSubscribeEvents();
+
 form?.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -157,9 +165,7 @@ form?.addEventListener("submit", async (e) => {
   const email = emailInput.value.trim();
   let valid = true;
 
-  if (heroSubmitError) {
-    heroSubmitError.textContent = "";
-  }
+  clearHeroSubmitError();
 
   // --- Validate First Name ---
   if (!firstName) {
@@ -448,6 +454,7 @@ const defaultCheckoutPlanConfig = {
   ],
 };
 
+/* ---- Checkout: State + Field Error Helpers ---- */
 function setCheckoutLoadingState(isLoading) {
   isCheckoutLoading = isLoading;
 
@@ -486,6 +493,7 @@ function resetCheckoutValidation() {
   });
 }
 
+/* ---- Checkout: Plan + Config Helpers ---- */
 function getSelectedCardData(cardEl) {
   const title =
     $(".ms-card-title", cardEl)?.textContent?.trim() ?? "Unknown Plan";
@@ -606,6 +614,7 @@ function renderSelectedPlanQuestions(plan) {
   });
 }
 
+/* ---- Checkout: Date/Time + Availability Helpers ---- */
 function normalizeToDateKey(dateObj) {
   const year = dateObj.getFullYear();
   const month = `${dateObj.getMonth() + 1}`.padStart(2, "0");
@@ -822,6 +831,7 @@ function renderCalendarGrid() {
   }
 }
 
+/* ---- Checkout: Calendly Availability Fetch + Cache ---- */
 async function fetchCalendlyAvailability(planId) {
   const eventTypeUri = getCalendlyEventTypeUri(planId);
   if (!eventTypeUri) {
@@ -1055,6 +1065,7 @@ async function loadPlanAvailability(planId) {
   renderCalendarGrid();
 }
 
+/* ---- Checkout: Modal Controls ---- */
 async function openCheckoutModal(cardEl) {
   selectedMentorshipCard = cardEl;
   await ensureCheckoutPlansLoaded();
@@ -1088,14 +1099,13 @@ async function openCheckoutModal(cardEl) {
   }
 }
 
-preloadCalendlyAvailability();
-
 function closeCheckoutModal() {
   checkoutOverlay.classList.remove("active");
   checkoutOverlay.setAttribute("aria-hidden", "true");
   setDatePickerOpen(false);
 }
 
+/* ---- Checkout: Payment Status Modal ---- */
 function showPaymentStatus(isSuccess) {
   paymentModal.className = `payment-modal ${isSuccess ? "success" : "failed"}`;
   setPaymentStatusIcon(isSuccess);
@@ -1299,6 +1309,7 @@ function closePaymentStatus() {
   paymentOverlay.setAttribute("aria-hidden", "true");
 }
 
+/* ---- Checkout: Validation + Submit Helpers ---- */
 function isValidCheckoutEmail(value) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
 }
@@ -1426,178 +1437,200 @@ async function submitCalendlyInvitee(bookingPayload) {
   return response.json();
 }
 
-checkoutDateButton?.addEventListener("click", () => {
-  if (checkoutDateButton.disabled) {
-    return;
-  }
+/* ---- Checkout: Event bindings ---- */
+function bindCheckoutPopoverEvents() {
+  checkoutDateButton?.addEventListener("click", () => {
+    if (checkoutDateButton.disabled) {
+      return;
+    }
 
-  renderCalendarGrid();
+    renderCalendarGrid();
 
-  const shouldOpen = checkoutDatePopover.hidden;
-  setDatePickerOpen(shouldOpen);
-  setTimePickerOpen(false);
-});
-
-checkoutDatePrev?.addEventListener("click", () => {
-  currentCalendarMonth = new Date(
-    currentCalendarMonth.getFullYear(),
-    currentCalendarMonth.getMonth() - 1,
-    1,
-  );
-  renderCalendarGrid();
-});
-
-checkoutDateNext?.addEventListener("click", () => {
-  currentCalendarMonth = new Date(
-    currentCalendarMonth.getFullYear(),
-    currentCalendarMonth.getMonth() + 1,
-    1,
-  );
-  renderCalendarGrid();
-});
-
-checkoutTimeButton?.addEventListener("click", () => {
-  if (checkoutTimeButton.disabled) {
-    return;
-  }
-  const shouldOpen = checkoutTimePopover.hidden;
-  setTimePickerOpen(shouldOpen);
-  setDatePickerOpen(false);
-});
-
-document.addEventListener("click", (event) => {
-  if (!checkoutDatePicker?.contains(event.target)) {
-    setDatePickerOpen(false);
-  }
-
-  if (!checkoutTimePicker?.contains(event.target)) {
+    const shouldOpen = checkoutDatePopover.hidden;
+    setDatePickerOpen(shouldOpen);
     setTimePickerOpen(false);
-  }
-});
+  });
 
-$$(".ms-apply-btn").forEach((btn) => {
-  btn.addEventListener("click", (event) => {
-    event.preventDefault();
-    const card = event.currentTarget.closest(".ms-card");
-    if (card) {
-      openCheckoutModal(card);
+  checkoutDatePrev?.addEventListener("click", () => {
+    currentCalendarMonth = new Date(
+      currentCalendarMonth.getFullYear(),
+      currentCalendarMonth.getMonth() - 1,
+      1,
+    );
+    renderCalendarGrid();
+  });
+
+  checkoutDateNext?.addEventListener("click", () => {
+    currentCalendarMonth = new Date(
+      currentCalendarMonth.getFullYear(),
+      currentCalendarMonth.getMonth() + 1,
+      1,
+    );
+    renderCalendarGrid();
+  });
+
+  checkoutTimeButton?.addEventListener("click", () => {
+    if (checkoutTimeButton.disabled) {
+      return;
+    }
+
+    const shouldOpen = checkoutTimePopover.hidden;
+    setTimePickerOpen(shouldOpen);
+    setDatePickerOpen(false);
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!checkoutDatePicker?.contains(event.target)) {
+      setDatePickerOpen(false);
+    }
+
+    if (!checkoutTimePicker?.contains(event.target)) {
+      setTimePickerOpen(false);
     }
   });
-});
+}
 
-checkoutClose?.addEventListener("click", closeCheckoutModal);
-checkoutOverlay?.addEventListener("click", (event) => {
-  if (event.target === checkoutOverlay) {
-    closeCheckoutModal();
-  }
-});
-
-paymentClose?.addEventListener("click", closePaymentStatus);
-paymentOverlay?.addEventListener("click", (event) => {
-  if (event.target === paymentOverlay) {
-    closePaymentStatus();
-  }
-});
-
-openPaymentModalFromQueryParams();
-
-checkoutName?.addEventListener("input", () =>
-  clearCheckoutFieldError(checkoutName, checkoutNameError),
-);
-checkoutPhone?.addEventListener("input", (event) => {
-  const cleanedValue = sanitizePhoneInput(event.target.value);
-  if (event.target.value !== cleanedValue) {
-    event.target.value = cleanedValue;
-  }
-  clearCheckoutFieldError(checkoutPhone, checkoutPhoneError);
-});
-checkoutEmail?.addEventListener("input", () =>
-  clearCheckoutFieldError(checkoutEmail, checkoutEmailError),
-);
-checkoutNote?.addEventListener("input", () =>
-  clearCheckoutFieldError(checkoutNote, checkoutNoteError),
-);
-checkoutTimeButton?.addEventListener("focus", () =>
-  clearCheckoutFieldError(checkoutTimeButton, checkoutTimeError),
-);
-
-checkoutQuestionInputs.forEach((input, index) => {
-  input?.addEventListener("input", () => {
-    clearCheckoutFieldError(input, checkoutQuestionErrors[index]);
+function bindCheckoutModalEvents() {
+  $$(".ms-apply-btn").forEach((btn) => {
+    btn.addEventListener("click", (event) => {
+      event.preventDefault();
+      const card = event.currentTarget.closest(".ms-card");
+      if (card) {
+        openCheckoutModal(card);
+      }
+    });
   });
-});
 
-checkoutForm?.addEventListener("submit", async (event) => {
-  event.preventDefault();
+  checkoutClose?.addEventListener("click", closeCheckoutModal);
+  checkoutOverlay?.addEventListener("click", (event) => {
+    if (event.target === checkoutOverlay) {
+      closeCheckoutModal();
+    }
+  });
 
-  if (isCheckoutLoading) {
-    return;
-  }
+  paymentClose?.addEventListener("click", closePaymentStatus);
+  paymentOverlay?.addEventListener("click", (event) => {
+    if (event.target === paymentOverlay) {
+      closePaymentStatus();
+    }
+  });
+}
 
-  if (!validateCheckoutForm()) {
-    return;
-  }
+function bindCheckoutFieldValidationEvents() {
+  checkoutName?.addEventListener("input", () =>
+    clearCheckoutFieldError(checkoutName, checkoutNameError),
+  );
 
-  setCheckoutLoadingState(true);
+  checkoutPhone?.addEventListener("input", (event) => {
+    const cleanedValue = sanitizePhoneInput(event.target.value);
+    if (event.target.value !== cleanedValue) {
+      event.target.value = cleanedValue;
+    }
+    clearCheckoutFieldError(checkoutPhone, checkoutPhoneError);
+  });
 
-  const selectedCardData = selectedMentorshipCard
-    ? getSelectedCardData(selectedMentorshipCard)
-    : { title: "Unknown Plan", price: "", priceType: "" };
+  checkoutEmail?.addEventListener("input", () =>
+    clearCheckoutFieldError(checkoutEmail, checkoutEmailError),
+  );
 
-  const planQuestions = checkoutQuestionInputs.map((input, index) => ({
-    question:
-      checkoutQuestionLabels[index]?.textContent?.trim() ??
-      `Question ${index + 1}`,
-    answer: input.value.trim(),
-  }));
+  checkoutNote?.addEventListener("input", () =>
+    clearCheckoutFieldError(checkoutNote, checkoutNoteError),
+  );
 
-  const checkoutPayload = {
-    selectedCard: selectedCardData,
-    name: checkoutName.value.trim(),
-    mobileNumber: getCheckoutPhoneNumber(),
-    email: checkoutEmail.value.trim(),
-    selectedDate: checkoutDateInput.value.trim(),
-    startTime: checkoutTimeInput.value.trim(),
-    note: checkoutNote.value.trim(),
-    planQuestions,
-  };
+  checkoutTimeButton?.addEventListener("focus", () =>
+    clearCheckoutFieldError(checkoutTimeButton, checkoutTimeError),
+  );
 
-  console.log("Mentorship checkout selected plan:", selectedCheckoutPlan);
-  console.log("Mentorship checkout submit:", checkoutPayload);
-  console.log("Checkout answers:", planQuestions);
+  checkoutQuestionInputs.forEach((input, index) => {
+    input?.addEventListener("input", () => {
+      clearCheckoutFieldError(input, checkoutQuestionErrors[index]);
+    });
+  });
+}
 
-  try {
-    // TODO: HERO SECTION SUBSCRIBE
-    // const calendlyResponse = await submitCalendlyInvitee(checkoutPayload);
-    const calendlyResponse = {
-      resource: {
-        event: "https://calendly.com/api/v1/events/ABC123",
-        uri: "https://calendly.com/api/v1/invitees/INVITE123",
-      },
+function bindCheckoutSubmitEvent() {
+  checkoutForm?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    if (isCheckoutLoading) {
+      return;
+    }
+
+    if (!validateCheckoutForm()) {
+      return;
+    }
+
+    setCheckoutLoadingState(true);
+
+    const selectedCardData = selectedMentorshipCard
+      ? getSelectedCardData(selectedMentorshipCard)
+      : { title: "Unknown Plan", price: "", priceType: "" };
+
+    const planQuestions = checkoutQuestionInputs.map((input, index) => ({
+      question:
+        checkoutQuestionLabels[index]?.textContent?.trim() ??
+        `Question ${index + 1}`,
+      answer: input.value.trim(),
+    }));
+
+    const checkoutPayload = {
+      selectedCard: selectedCardData,
+      name: checkoutName.value.trim(),
+      mobileNumber: getCheckoutPhoneNumber(),
+      email: checkoutEmail.value.trim(),
+      selectedDate: checkoutDateInput.value.trim(),
+      startTime: checkoutTimeInput.value.trim(),
+      note: checkoutNote.value.trim(),
+      planQuestions,
     };
-    const eventUri = calendlyResponse?.resource?.event ?? "Hi";
-    const inviteeUri = calendlyResponse?.resource?.uri ?? "Hi";
-    const modalExternalMessage = [
-      eventUri ? `Event: ${eventUri}` : "",
-      inviteeUri ? `Invitee: ${inviteeUri}` : "",
-    ]
-      .filter(Boolean)
-      .join(" | ");
 
-    setCheckoutLoadingState(false);
-    closeCheckoutModal();
-    showPaymentSuccessModal(modalExternalMessage);
-    checkoutForm.reset();
-    resetSchedulingSelection();
-    resetCheckoutValidation();
-  } catch (error) {
-    console.error("Calendly booking error:", error);
-    setCheckoutLoadingState(false);
-    showPaymentFailedModal(
-      error instanceof Error ? error.message : "Calendly booking failed.",
-    );
-  }
-});
+    console.log("Mentorship checkout selected plan:", selectedCheckoutPlan);
+    console.log("Mentorship checkout submit:", checkoutPayload);
+    console.log("Checkout answers:", planQuestions);
+    // TODO: PAYMENT SUBMIT
+    try {
+      // const calendlyResponse = await submitCalendlyInvitee(checkoutPayload);
+      const calendlyResponse = {
+        resource: {
+          event: "https://calendly.com/api/v1/events/ABC123",
+          uri: "https://calendly.com/api/v1/invitees/INVITE123",
+        },
+      };
+      const eventUri = calendlyResponse?.resource?.event ?? "Hi";
+      const inviteeUri = calendlyResponse?.resource?.uri ?? "Hi";
+      const modalExternalMessage = [
+        eventUri ? `Event: ${eventUri}` : "",
+        inviteeUri ? `Invitee: ${inviteeUri}` : "",
+      ]
+        .filter(Boolean)
+        .join(" | ");
+
+      setCheckoutLoadingState(false);
+      closeCheckoutModal();
+      showPaymentSuccessModal(modalExternalMessage);
+      checkoutForm.reset();
+      resetSchedulingSelection();
+      resetCheckoutValidation();
+    } catch (error) {
+      console.error("Calendly booking error:", error);
+      setCheckoutLoadingState(false);
+      showPaymentFailedModal(
+        error instanceof Error ? error.message : "Calendly booking failed.",
+      );
+    }
+  });
+}
+
+function initCheckoutFeature() {
+  preloadCalendlyAvailability();
+  bindCheckoutPopoverEvents();
+  bindCheckoutModalEvents();
+  bindCheckoutFieldValidationEvents();
+  bindCheckoutSubmitEvent();
+  openPaymentModalFromQueryParams();
+}
+
+initCheckoutFeature();
 
 /* ============================================================
    8. FLOATING QUERY WIDGET
@@ -1622,6 +1655,7 @@ const queryMessageError = $("#queryMessageError");
 
 let isFloatingQueryLoading = false;
 
+/* ---- Floating Query: State + Field Error Helpers ---- */
 function setFloatingQueryLoadingState(isLoading) {
   isFloatingQueryLoading = isLoading;
 
@@ -1715,65 +1749,80 @@ function validateFloatingQueryForm() {
   return isValid;
 }
 
-floatingQueryBtn?.addEventListener("click", openFloatingQueryWidget);
-questionsSendMessageBtn?.addEventListener("click", openFloatingQueryWidget);
-floatingQueryClose?.addEventListener("click", closeFloatingQueryWidget);
+/* ---- Floating Query: Event bindings ---- */
+function bindFloatingQueryModalEvents() {
+  floatingQueryBtn?.addEventListener("click", openFloatingQueryWidget);
+  questionsSendMessageBtn?.addEventListener("click", openFloatingQueryWidget);
+  floatingQueryClose?.addEventListener("click", closeFloatingQueryWidget);
 
-floatingQueryOverlay?.addEventListener("click", (event) => {
-  if (event.target === floatingQueryOverlay) {
-    closeFloatingQueryWidget();
-  }
-});
+  floatingQueryOverlay?.addEventListener("click", (event) => {
+    if (event.target === floatingQueryOverlay) {
+      closeFloatingQueryWidget();
+    }
+  });
+}
 
-queryName?.addEventListener("input", () =>
-  clearQueryFieldError(queryName, queryNameError),
-);
-queryEmail?.addEventListener("input", () =>
-  clearQueryFieldError(queryEmail, queryEmailError),
-);
-queryMessage?.addEventListener("input", () =>
-  clearQueryFieldError(queryMessage, queryMessageError),
-);
+function bindFloatingQueryFieldEvents() {
+  queryName?.addEventListener("input", () =>
+    clearQueryFieldError(queryName, queryNameError),
+  );
+  queryEmail?.addEventListener("input", () =>
+    clearQueryFieldError(queryEmail, queryEmailError),
+  );
+  queryMessage?.addEventListener("input", () =>
+    clearQueryFieldError(queryMessage, queryMessageError),
+  );
+}
 
-floatingQueryForm?.addEventListener("submit", async (event) => {
-  event.preventDefault();
+function bindFloatingQuerySubmitEvent() {
+  floatingQueryForm?.addEventListener("submit", async (event) => {
+    event.preventDefault();
 
-  if (isFloatingQueryLoading) {
-    return;
-  }
+    if (isFloatingQueryLoading) {
+      return;
+    }
 
-  if (!validateFloatingQueryForm()) {
-    return;
-  }
+    if (!validateFloatingQueryForm()) {
+      return;
+    }
 
-  setFloatingQueryLoadingState(true);
+    setFloatingQueryLoadingState(true);
 
-  const queryPayload = {
-    name: queryName.value.trim(),
-    email: queryEmail.value.trim(),
-    question: queryMessage.value.trim(),
-  };
+    const queryPayload = {
+      name: queryName.value.trim(),
+      email: queryEmail.value.trim(),
+      question: queryMessage.value.trim(),
+    };
 
-  console.log("Have Question submit:", queryPayload);
-  // TODO: FLOATING QUERY SUBMIT
+    console.log("Have Question submit:", queryPayload);
+    // TODO: FLOATING QUERY SUBMIT
 
-  // await new Promise((resolve) => setTimeout(resolve, 5000));
-  const isSuccess = true;
+    // await new Promise((resolve) => setTimeout(resolve, 5000));
+    const isSuccess = true;
 
-  if (!isSuccess) {
+    if (!isSuccess) {
+      setFloatingQueryLoadingState(false);
+      floatingQuerySubmitError.textContent =
+        "Something went wrong. Please try again in a moment.";
+      return;
+    }
+
+    floatingQuerySubmitError.textContent = "";
     setFloatingQueryLoadingState(false);
-    floatingQuerySubmitError.textContent =
-      "Something went wrong. Please try again in a moment.";
-    return;
-  }
 
-  floatingQuerySubmitError.textContent = "";
-  setFloatingQueryLoadingState(false);
+    if (floatingQueryContent) {
+      floatingQueryContent.hidden = true;
+    }
+    if (floatingQuerySuccess) {
+      floatingQuerySuccess.hidden = false;
+    }
+  });
+}
 
-  if (floatingQueryContent) {
-    floatingQueryContent.hidden = true;
-  }
-  if (floatingQuerySuccess) {
-    floatingQuerySuccess.hidden = false;
-  }
-});
+function initFloatingQueryFeature() {
+  bindFloatingQueryModalEvents();
+  bindFloatingQueryFieldEvents();
+  bindFloatingQuerySubmitEvent();
+}
+
+initFloatingQueryFeature();

@@ -36,55 +36,41 @@
 
 ---
 
-## 2. Hero Section
-
-- Change slider autoplay timing  
-  - Search: `TODO: SLIDER AUTOPLAY TIMING`
-
----
-
-## 3. Hero Section Subscribe
+## 2. Hero Section Subscribe
 
 - Add submit logic  
   - Search: `TODO: HERO SECTION SUBSCRIBE`
 
 ---
 
-## 4. Plan Payment Button
+## 3. Plan Payment Button
 
 - Add submit logic  
   - Search: `TODO: PAYMENT SUBMIT`
 
 ---
 
-## 5. Floating Button
+## 4. Floating Button
 
 - Add submit logic  
   - Search: `TODO: FLOATING QUERY SUBMIT`
 
 ---
 
-## 6. Sliders
-
-- Upload image
-- Copy previous slider `<div>` code
-- Change only the image file name
-
----
-
-## 7. Questions Section
+## 5. Questions Section
 
 - Update email
 - Add Instagram link
 
 ---
 
-## 8. Footer
+## 6. Footer
 
 - Update footer content
 
+---
 
-## 9. Redirection from Payment Gateway to Website 
+## 7. Redirection from Payment Gateway to Website 
 
 - Show Success Popup Add query Parameters
 https://example.com/?payment=true&status=success&order_id=ORD12345&txn_id=TXN778899&amount=299&plan=monthly_coaching&test=data
@@ -95,3 +81,14 @@ If you add more query paramters then it will add to the details automatically
 https://example.com/?payment=true&status=fail&order_id=ORD12345&txn_id=TXN778899&reason=signature_mismatch&amount=299
 
 If you add more query paramters then it will add to the details automatically
+
+---
+
+## 8. Tokens and Other config for calendy in index.html
+
+window.CALENDLY_CONFIG = {
+        token: "",
+        apiBaseUrl: "https://api.calendly.com",
+        availabilityWindowDays: 7,
+        eventTypeUri: "https://api.calendly.com/event_types/37a52748-3b49-491f-8fda-127d06209c77"
+};
