@@ -379,6 +379,8 @@ const paymentClose = $("#paymentClose");
 const paymentStatusIcon = $("#paymentStatusIcon");
 const paymentStatusTitle = $("#paymentStatusTitle");
 const paymentStatusMessage = $("#paymentStatusMessage");
+const paymentQueryMessage = $("#paymentQueryMessage");
+const paymentQueryDetails = $("#paymentQueryDetails");
 const paymentExternalMessage = $("#paymentExternalMessage");
 
 let selectedMentorshipCard = null;
@@ -1096,17 +1098,26 @@ function closeCheckoutModal() {
 
 function showPaymentStatus(isSuccess) {
   paymentModal.className = `payment-modal ${isSuccess ? "success" : "failed"}`;
+  setPaymentStatusIcon(isSuccess);
 
   if (isSuccess) {
-    paymentStatusIcon.textContent = "🎉";
     paymentStatusTitle.textContent = "Payment Successful";
     paymentStatusMessage.textContent =
       "Payment successful. We will contact you soon.";
   } else {
-    paymentStatusIcon.textContent = "⚠️";
     paymentStatusTitle.textContent = "Payment Failed";
     paymentStatusMessage.textContent =
       "Payment failed. Please try again after some time. If amount is debited, our team will verify and contact you.";
+  }
+
+  if (paymentQueryMessage) {
+    paymentQueryMessage.textContent = "";
+    paymentQueryMessage.hidden = true;
+  }
+
+  if (paymentQueryDetails) {
+    paymentQueryDetails.innerHTML = "";
+    paymentQueryDetails.hidden = true;
   }
 
   if (paymentExternalMessage) {
@@ -1126,11 +1137,43 @@ function showPaymentSuccessModal(externalMessage = "") {
   }
 }
 
-function showPaymentFailedModal(externalMessage = "") {
+function showPaymentFailedModal(externalMessage = "", options = {}) {
+  const queryMessage = options.queryMessage ?? "";
+  const queryEntries = Array.isArray(options.queryEntries)
+    ? options.queryEntries
+    : [];
+
   paymentModal.className = "payment-modal failed";
-  paymentStatusIcon.textContent = "⚠️";
+  setPaymentStatusIcon(false);
   paymentStatusTitle.textContent = "Payment Failed";
   paymentStatusMessage.textContent = "Payment failed. Please try again later.";
+
+  if (paymentQueryMessage) {
+    paymentQueryMessage.textContent = queryMessage.trim();
+    paymentQueryMessage.hidden = !queryMessage.trim();
+  }
+
+  if (paymentQueryDetails) {
+    paymentQueryDetails.innerHTML = "";
+    queryEntries.forEach(([rawKey, rawValue]) => {
+      const row = document.createElement("div");
+      row.className = "payment-query-details-row";
+
+      const keyEl = document.createElement("span");
+      keyEl.className = "payment-query-details-key";
+      keyEl.textContent = `${formatQueryParamKey(rawKey)}:`;
+
+      const valueEl = document.createElement("span");
+      valueEl.className = "payment-query-details-value";
+      valueEl.textContent = rawValue || "-";
+
+      row.appendChild(keyEl);
+      row.appendChild(valueEl);
+      paymentQueryDetails.appendChild(row);
+    });
+
+    paymentQueryDetails.hidden = queryEntries.length === 0;
+  }
 
   if (paymentExternalMessage && externalMessage.trim()) {
     paymentExternalMessage.textContent = externalMessage.trim();
@@ -1142,6 +1185,113 @@ function showPaymentFailedModal(externalMessage = "") {
 
   paymentOverlay.classList.add("active");
   paymentOverlay.setAttribute("aria-hidden", "false");
+}
+
+function setPaymentStatusIcon(isSuccess) {
+  if (!paymentStatusIcon) {
+    return;
+  }
+
+  const iconMarkup = isSuccess
+    ? '<span class="payment-icon-symbol payment-icon-symbol--success" aria-hidden="true">&#10003;</span>'
+    : '<span class="payment-icon-symbol payment-icon-symbol--failed" aria-hidden="true">&#10005;</span>';
+
+  paymentStatusIcon.innerHTML = iconMarkup;
+}
+
+function formatQueryParamKey(key) {
+  return key
+    .replace(/[_-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function isTruthyQueryValue(value) {
+  if (typeof value !== "string") {
+    return false;
+  }
+
+  const normalized = value.trim().toLowerCase();
+  return normalized === "true" || normalized === "1" || normalized === "yes";
+}
+
+function normalizePaymentStatus(value) {
+  if (typeof value !== "string") {
+    return "";
+  }
+
+  const normalized = value.trim().toLowerCase();
+  if (normalized === "success" || normalized === "successful") {
+    return "success";
+  }
+
+  if (normalized === "fail" || normalized === "failed" || normalized === "error") {
+    return "fail";
+  }
+
+  return "";
+}
+
+function openPaymentModalFromQueryParams() {
+  const params = new URLSearchParams(window.location.search);
+  const shouldOpenPaymentModal = isTruthyQueryValue(params.get("payment"));
+
+  if (!shouldOpenPaymentModal) {
+    return;
+  }
+
+  const normalizedStatus = normalizePaymentStatus(params.get("status"));
+  const queryEntries = [];
+
+  params.forEach((value, key) => {
+    if (key === "payment" || key === "status") {
+      return;
+    }
+    queryEntries.push([key, value]);
+  });
+
+  if (normalizedStatus === "success") {
+    showPaymentStatus(true);
+    paymentStatusMessage.textContent =
+      "Payment successful. We have received your request and will contact you soon.";
+
+    if (paymentQueryMessage) {
+      paymentQueryMessage.textContent =
+        "Your payment was confirmed successfully. Here are your transaction details:";
+      paymentQueryMessage.hidden = false;
+    }
+
+    if (paymentQueryDetails) {
+      paymentQueryDetails.innerHTML = "";
+
+      queryEntries.forEach(([rawKey, rawValue]) => {
+        const row = document.createElement("div");
+        row.className = "payment-query-details-row";
+
+        const keyEl = document.createElement("span");
+        keyEl.className = "payment-query-details-key";
+        keyEl.textContent = `${formatQueryParamKey(rawKey)}:`;
+
+        const valueEl = document.createElement("span");
+        valueEl.className = "payment-query-details-value";
+        valueEl.textContent = rawValue || "-";
+
+        row.appendChild(keyEl);
+        row.appendChild(valueEl);
+        paymentQueryDetails.appendChild(row);
+      });
+
+      paymentQueryDetails.hidden = queryEntries.length === 0;
+    }
+
+    return;
+  }
+
+  showPaymentFailedModal("", {
+    queryMessage:
+      "We could not confirm this payment. If money was debited, please share these details with support.",
+    queryEntries,
+  });
 }
 
 function closePaymentStatus() {
@@ -1349,6 +1499,8 @@ paymentOverlay?.addEventListener("click", (event) => {
   }
 });
 
+openPaymentModalFromQueryParams();
+
 checkoutName?.addEventListener("input", () =>
   clearCheckoutFieldError(checkoutName, checkoutNameError),
 );
@@ -1415,9 +1567,16 @@ checkoutForm?.addEventListener("submit", async (event) => {
   console.log("Checkout answers:", planQuestions);
 
   try {
-    const calendlyResponse = await submitCalendlyInvitee(checkoutPayload);
-    const eventUri = calendlyResponse?.resource?.event ?? "";
-    const inviteeUri = calendlyResponse?.resource?.uri ?? "";
+    // TODO: HERO SECTION SUBSCRIBE
+    // const calendlyResponse = await submitCalendlyInvitee(checkoutPayload);
+    const calendlyResponse = {
+      resource: {
+        event: "https://calendly.com/api/v1/events/ABC123",
+        uri: "https://calendly.com/api/v1/invitees/INVITE123",
+      },
+    };
+    const eventUri = calendlyResponse?.resource?.event ?? "Hi";
+    const inviteeUri = calendlyResponse?.resource?.uri ?? "Hi";
     const modalExternalMessage = [
       eventUri ? `Event: ${eventUri}` : "",
       inviteeUri ? `Invitee: ${inviteeUri}` : "",

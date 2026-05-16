@@ -82,3 +82,16 @@
 ## 8. Footer
 
 - Update footer content
+
+
+## 9. Redirection from Payment Gateway to Website 
+
+- Show Success Popup Add query Parameters
+https://example.com/?payment=true&status=success&order_id=ORD12345&txn_id=TXN778899&amount=299&plan=monthly_coaching&test=data
+
+If you add more query paramters then it will add to the details automatically
+
+- Show Failed Payment Popup
+https://example.com/?payment=true&status=fail&order_id=ORD12345&txn_id=TXN778899&reason=signature_mismatch&amount=299
+
+If you add more query paramters then it will add to the details automatically
