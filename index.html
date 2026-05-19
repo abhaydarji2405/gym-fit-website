@@ -90,16 +90,7 @@
     <nav class="navbar">
       <div class="nav-inner">
         <a href="#" class="nav-logo">Manu</a>
-        <ul class="nav-links">
-          <li><a href="#mentorship">Mentorship</a></li>
-          <li><a href="#journey">My Journey</a></li>
-          <li><a href="#questions">Contact</a></li>
-          <li><a href="#questions">Questions</a></li>
-        </ul>
-        <!-- Hamburger (mobile) -->
-        <button class="hamburger" id="hamburger" aria-label="Toggle menu">
-          <span></span><span></span><span></span>
-        </button>
+        <a href="#mentorship" class="nav-single-link">Mentorship</a>
       </div>
     </nav>
 
@@ -204,7 +195,7 @@
                   </ul>
                 </div>
                 <div class="ms-card-footer">
-                  <a href="#" class="ms-apply-btn">Apply Now</a>
+                  <a href="#" class="ms-apply-btn ms-apply-btn--dark">Apply Now</a>
                 </div>
               </article>
 
@@ -259,7 +250,7 @@
                   </ul>
                 </div>
                 <div class="ms-card-footer">
-                  <a href="#" class="ms-apply-btn">Apply Now</a>
+                  <a href="#" class="ms-apply-btn ms-apply-btn--dark">Apply Now</a>
                 </div>
               </article>
 
@@ -293,28 +284,16 @@
 
         <div class="journey-layout">
           <div class="journey-media" aria-label="Transformation images">
-            <figure class="journey-phase">
-              <div class="journey-img-wrap">
-                <img src="assets/phase-1.png" alt="Age 30 – Training hard but guessing" loading="lazy" />
-                <span class="journey-age-tag">Age 30</span>
-              </div>
-              <figcaption class="journey-phase-content">
-                <h4 class="journey-phase-title">Training Hard, But Guessing</h4>
-                <p class="journey-phase-desc">Working out consistently, but without a clear structure.</p>
-              </figcaption>
-            </figure>
-
-            <div class="journey-media-arrow" aria-hidden="true">
-              <svg viewBox="0 0 80 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <line x1="0" y1="12" x2="66" y2="12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-                <polyline points="56,4 68,12 56,20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </div>
-
-            <figure class="journey-phase journey-phase--highlight">
-              <div class="journey-img-wrap">
-                <img src="assets/phase-3.png" alt="Age 37 – The result of structure" loading="lazy" />
-                <span class="journey-age-tag journey-age-tag--today">Age 37 — Today</span>
+            <figure class="journey-combined">
+              <div class="journey-combined-images">
+                <div class="journey-img-wrap journey-img-wrap--combined">
+                  <img src="assets/phase-1.png" alt="Age 30 – Training hard but guessing" loading="lazy" />
+                  <span class="journey-age-tag">Age 30</span>
+                </div>
+                <div class="journey-img-wrap journey-img-wrap--combined">
+                  <img src="assets/phase-3.png" alt="Age 37 – The result of structure" loading="lazy" />
+                  <span class="journey-age-tag journey-age-tag--today">Age 37 — Today</span>
+                </div>
               </div>
               <figcaption class="journey-phase-content">
                 <h4 class="journey-phase-title">The Result of Structure</h4>
@@ -538,7 +517,7 @@
     </div>
 
     <!-- ===== FLOATING QUERY WIDGET ===== -->
-    <button class="floating-query-btn" id="floatingQueryBtn" aria-label="Open query form">
+    <button class="floating-query-btn" id="floatingQueryBtn" aria-label="Open query form" style="display: none;">
       Have Questions?
     </button>
 
@@ -578,7 +557,7 @@
 
             <div class="checkout-actions">
               <button type="submit" class="checkout-submit-btn floating-query-submit-btn" id="floatingQuerySubmitBtn" style="margin-top: 0;">
-                <span class="floating-query-submit-btn__label">Submit Query</span>
+                <span class="floating-query-submit-btn__label">SUBMIT</span>
                 <span class="floating-query-submit-btn__loader" aria-hidden="true">
                   <span class="floating-query-submit-btn__loader-line"></span>
                 </span>

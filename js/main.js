@@ -33,24 +33,7 @@ animEls.forEach((el, i) => {
   observer.observe(el);
 });
 
-/* ============================================================
-   2. NAVBAR – hamburger toggle
-   ============================================================ */
-const hamburger = $("#hamburger");
-const navLinks = $(".nav-links");
-
-hamburger?.addEventListener("click", () => {
-  hamburger.classList.toggle("open");
-  navLinks.classList.toggle("mobile-open");
-});
-
-// Close mobile menu when a link is clicked
-$$(".nav-links a").forEach((a) =>
-  a.addEventListener("click", () => {
-    hamburger.classList.remove("open");
-    navLinks.classList.remove("mobile-open");
-  }),
-);
+// ...navbar hamburger/menu logic removed: only single link shown for all views...
 
 /* ============================================================
    3. POPUP HELPERS
